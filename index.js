@@ -1,3 +1,7 @@
+/*
+todo: dockerize, permissions based commands, categorize help menu, help menu pagination, AI stop session intent
+*/
+
 const Discord = require('discord.js');
 const fs = require('fs');
 
