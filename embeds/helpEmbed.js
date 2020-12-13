@@ -10,10 +10,6 @@ module.exports = {
             .setThumbnail(pfpURL)
             .setTimestamp()
             .setFooter('Written by vibrant#0001');
-
-        console.log(command);
-        
-        
         return embed.addField(`${commandName} command`, `Description: ${command.description}\nUsage: ${command.usage}`);
     }
 };

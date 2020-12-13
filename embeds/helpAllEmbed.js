@@ -16,6 +16,6 @@ module.exports = {
         }
         
         
-        return embed.addField('Commands', commandsList.join('\n'));
+        return embed.addField('Commands', commandsList.join('\n')).addField('\u200B', ' See more about a specific command using `help [command]`');
     }
 };

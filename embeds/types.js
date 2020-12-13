@@ -11,8 +11,6 @@ for (const file of embedDir) {
     }
 }
 
-console.log(embeds);
-
 module.exports = {
     helpAllEmbed(commands) {
         return embeds.get('helpAllEmbed').createEmbed(commands);
