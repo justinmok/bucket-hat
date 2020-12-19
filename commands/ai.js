@@ -1,14 +1,12 @@
 const dialogFlow = require('@google-cloud/dialogflow');
 const uuid = require('uuid');
 
-async function replyMsg(msg, session) {
-    //todo: change to config variable
-    const projectID = 'jovial-arch-289804';
+async function replyMsg(msg, session, projectID) {
     const sessionClient = new dialogFlow.SessionsClient();
-    const sesisonPath = await sessionClient.projectAgentSessionPath(projectID, session);
+    const sessionPath = await sessionClient.projectAgentSessionPath(projectID, session);
 
     const request = {
-        session: sesisonPath,
+        session: sessionPath,
         queryInput: {
             text: {
                 text: msg,
@@ -38,7 +36,7 @@ module.exports = {
 
             confirmCollector.on('collect', msg => {
                 if (/^(yes)|^(ya)|(^y$)/gi.test(msg.content)) {
-                    msg.channel.send    ('Got it! 👍 Start by asking "What is your name?" The session should automatically end after 5 minutes of inactivity.');
+                    msg.channel.send('Got it! 👍 Start by asking "What is your name?" The session should automatically end after 5 minutes of inactivity.');
                     confirmCollector.stop('confirmed');
                 } else return;
             });
@@ -50,12 +48,13 @@ module.exports = {
                 }
 
                 const sessionID = uuid.v4();
+                let cloudProjectID = message.client.cloudProjectID;
                 let isAuthor = m => m.author.id == message.author.id;
 
                 let dialogCollector = msg.channel.createMessageCollector(isAuthor, { idle: 300000});
 
                 dialogCollector.on('collect', msg => {
-                    replyMsg(msg, sessionID).then((res) => message.channel.send(res)); 
+                    replyMsg(msg, sessionID, cloudProjectID).then((res) => message.channel.send(res)); 
                 });
 
                 dialogCollector.on('end', () => {

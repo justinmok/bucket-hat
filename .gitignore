@@ -1,3 +1,7 @@
 # node modules lol
 node_modules/*
 logs/*
+
+# random audio files for testing
+*.ogg
+*.mp3
