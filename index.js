@@ -67,21 +67,36 @@ client.on('message', message => {
 
 const request = {
     config: {
-        encoding: 'LINEAR16',
+        encoding: 'OGG_OPUS',
         sampleRateHertz: 48000,
         languageCode: 'en-US',
     },
+    single_utterance: true,
     interimResults: false,
 };
 
+/* 
 const speechDetection = speechClient.streamingRecognize(request).on('error', console.error)
     .on('data', data => {
+        console.log('hello this is working?');
         if (data.results[0] && data.results[0].alternatives[0]) {
             client.guilds.cache.get('378778569465266197')
-                .channels.cache.get('378778569465266199')
+                .channels.cache.get('789948807097352242')
                 .send(`some guy in vc: ${data.results[0].alternatives[0].transcript}`);
         }
     });
+*/
+
+const recognizeStream = speechClient
+    .streamingRecognize(request)
+    .on('error', console.error)
+    .on('data', data =>
+        console.log(
+            data.results[0] && data.results[0].alternatives[0]
+                ? `Transcription: ${data.results[0].alternatives[0].transcript}\n`
+                : '\n\nReached transcription time limit, press Ctrl+C\n'
+        )
+    );
 
 const listenConnection = connection => {
     const receiver = connection.receiver;
@@ -92,8 +107,19 @@ const listenConnection = connection => {
 
     // eslint-disable-next-line no-unused-vars 
     connection.on('speaking', (user, speaking) => { 
-        console.log(`Listening to ${user.username}`);
-        receiver.createStream(user, { mode: 'pcm'}).pipe(speechDetection); 
+        // temp user id check
+        if (user.id == '148521718388883456') {
+            let readStream = receiver.createStream(user, { mode: 'pcm'});
+            let piped = readStream.pipe(recognizeStream);
+
+            // debug packet len
+            readStream.on('data', () => console.log(readStream.readableFlowing));
+            piped.on('pipe', pipe => console.log(`receiving: ${pipe.readableFlowing}`));
+
+            readStream.on('end', () => {
+                recognizeStream.end();
+            });
+        }
     });
 };
 
