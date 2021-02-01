@@ -8,7 +8,7 @@ let processQueue = (connection, queue) => {
     console.log('now playing: ', queue[0].title);
     stream.on('end', () => {
         console.warn('stream ended');
-        queue.pop(0);
+        queue.shift();
         processQueue(connection, queue);
     });
 };
@@ -45,6 +45,7 @@ module.exports = {
                 console.log(isPlaying);
                 console.log(queue);
                 if (!isPlaying) processQueue(connection, queue);
+                else message.channel.send(`Added ${queue[0].title} to the queue.`);
             });
         });
 
