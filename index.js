@@ -5,7 +5,7 @@ todo: dockerize, permissions based commands, categorize help menu, help menu pag
 const Discord = require('discord.js');
 const fs = require('fs');
 
-const speech = require('@google-cloud/speech');
+//const speech = require('@google-cloud/speech');
 
 let config = require('./config.json');
 let prefixes = require('./prefixes.json');
@@ -13,12 +13,14 @@ let prefixes = require('./prefixes.json');
 const { token, defaultPrefix, cloudProjectID } = config;
 
 const client = new Discord.Client();
-const speechClient = new speech.SpeechClient();
+//const speechClient = new speech.SpeechClient();
 
 client.defaultPrefix = defaultPrefix;
 client.commands = new Discord.Collection();
 client.prefixes = new Discord.Collection();
+client.musicQueue = [];
 client.cloudProjectID = cloudProjectID;
+
 
 for (const [server, prefix] of Object.entries(prefixes)) {
     client.prefixes.set(server, prefix);
@@ -87,7 +89,7 @@ const speechDetection = speechClient.streamingRecognize(request).on('error', con
     });
 */
 
-const recognizeStream = speechClient
+/* const recognizeStream = speechClient
     .streamingRecognize(request)
     .on('error', console.error)
     .on('data', data =>
@@ -98,6 +100,7 @@ const recognizeStream = speechClient
         )
     );
 
+*/
 const listenConnection = connection => {
     const receiver = connection.receiver;
     
@@ -110,18 +113,19 @@ const listenConnection = connection => {
         // temp user id check
         if (user.id == '148521718388883456') {
             let readStream = receiver.createStream(user, { mode: 'pcm'});
-            let piped = readStream.pipe(recognizeStream);
+            //let piped = readStream.pipe(recognizeStream);
 
             // debug packet len
             readStream.on('data', () => console.log(readStream.readableFlowing));
-            piped.on('pipe', pipe => console.log(`receiving: ${pipe.readableFlowing}`));
+            //piped.on('pipe', pipe => console.log(`receiving: ${pipe.readableFlowing}`));
 
             readStream.on('end', () => {
-                recognizeStream.end();
+            //    recognizeStream.end();
             });
         }
     });
 };
+
 
 client.on('voiceStateUpdate', (oldState, newState) => {
 
@@ -140,17 +144,17 @@ client.on('voiceStateUpdate', (oldState, newState) => {
     // User leaves channel
     if (channelFinal == null) {
         console.log(`Leaving ${channelPrevious.name}`);
-        channelPrevious.leave();
+        //channelPrevious.leave();
     }
     // User joins channel
     else if (channelPrevious == null) {
         console.log(`Joining ${channelFinal.name}`);
-        channelFinal.join().then(connection => listenConnection(connection));
+        //channelFinal.join().then(connection => listenConnection(connection));
     }
     // User moves channel
     else if (channelFinal !== null && channelPrevious !== null) {
         console.log(`Leaving ${channelPrevious.name}, Joining ${channelFinal.name}`);
-        channelFinal.join().then(connection => listenConnection(connection));
+        //channelFinal.join().then(connection => listenConnection(connection));
     }
 });
 
