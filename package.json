@@ -33,7 +33,7 @@
     "moment": "^2.29.1",
     "node-record-lpcm16": "^1.0.1",
     "uuid": "^8.3.2",
-    "youtube-dl": "^3.1.0",
+    "youtube-dl": "^3.1.0"
   },
   "devDependencies": {
     "eslint": "^7.14.0"
