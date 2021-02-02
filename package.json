@@ -30,8 +30,6 @@
     "dialogflow": "^1.2.0",
     "discord.js": "^12.5.1",
     "ffmpeg": "0.0.4",
-    "moment": "^2.29.1",
-    "node-record-lpcm16": "^1.0.1",
     "uuid": "^8.3.2",
     "youtube-dl": "^3.1.0"
   },

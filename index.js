@@ -66,7 +66,7 @@ client.on('message', message => {
         });
     }
 });
-
+/* 
 const request = {
     config: {
         encoding: 'OGG_OPUS',
@@ -77,7 +77,7 @@ const request = {
     interimResults: false,
 };
 
-/* 
+
 const speechDetection = speechClient.streamingRecognize(request).on('error', console.error)
     .on('data', data => {
         console.log('hello this is working?');
@@ -100,7 +100,7 @@ const speechDetection = speechClient.streamingRecognize(request).on('error', con
         )
     );
 
-*/
+
 const listenConnection = connection => {
     const receiver = connection.receiver;
     
@@ -126,7 +126,7 @@ const listenConnection = connection => {
     });
 };
 
-
+*/
 client.on('voiceStateUpdate', (oldState, newState) => {
 
     let user = oldState.guild.members.cache.get(oldState.id);

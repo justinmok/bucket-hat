@@ -12,6 +12,7 @@ module.exports = {
 
     execute(message, args) {
         const { musicQueue } = message.client;
+        if (!musicQueue.length) return;
         if (args.length == 0) {
             let embed = queueEmbed(musicQueue);
             message.channel.send(embed);

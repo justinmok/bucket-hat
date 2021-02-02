@@ -3,27 +3,24 @@ const youtubedl = require('youtube-dl');
 let processQueue = (connection, queue) => {
     if (queue.length == 0) return;
     let url = queue[0].query;
-    let stream = youtubedl(url, ['--format=bestaudio']);
     console.log(url);
-    connection.play(stream, { volume: 0.5});
+    let stream = youtubedl(url);
     console.log('now playing: ', queue[0].title);
 
-    stream.on('error', (error) => {
-        throw error;
-    });
-
-    stream.on('end', (reason) => {
-        console.warn(`ended reason: ${reason}`);
-        queue.shift();
-        processQueue(connection, queue);
-    });
+    connection.play(stream, { passes: 3, bitrate: 'auto' })
+        .on('finish', () => {
+            queue.shift();
+            processQueue(connection, queue);
+        }).on('error', error => console.error(error));
 };
+
 
 module.exports = {
     name: 'play',
     category: 'General',
     description: 'Plays a youtube video in the vc lol',
     usage: '[youtube link]',
+    processQueue,
     execute(message, args) {
         if (!args.length) return;
         let user = message.member;
@@ -31,32 +28,30 @@ module.exports = {
         let { musicQueue } = message.client;
         let isPlaying = musicQueue.length != 0;
 
+        if (!voice.channel)
+            return message.channel.send('Join a voice channel to use this command.');
+
         let query = args.join(' ');
         if (!query.includes('.com')) query = 'ytsearch1:' + query;
-        //if (!query.includes('youtube')) return message.channel.send(`\`${url}\` was not a valid Youtube url.`);
+    
 
-        // get into
-        youtubedl.getInfo(query, (err, info) => {
-            if (err) throw err;
-            musicQueue.push({
-                query: query,
-                title: info.title,
-                requester: user,
-                info: info,
-            });
+        voice.channel.join().then((connection) => {
+            youtubedl.getInfo(query, (err, info) => {
+                if (err) throw err;
+                musicQueue.push({
+                    query: query,
+                    title: info.title,
+                    requester: user,
+                    info: info,
+                });
 
-            if (!voice.channel)
-                return message.channel.send('You are not in a voice channel.');
-
-            voice.channel.join().then((connection) => {
-            // check if there is a queue
-                console.log(isPlaying);
-                if (!isPlaying) processQueue(connection, musicQueue);
+                if (!isPlaying) {
+                    message.channel.send(`Now playing ${info.title} in ${voice.channel.name}`);
+                    processQueue(connection, musicQueue);
+                }
                 else message.channel.send(`Added ${musicQueue.slice(-1)[0].title} to the queue.`);
             });
         });
 
-        // join and play
-        
     },
 };
