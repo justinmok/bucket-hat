@@ -1,13 +1,19 @@
 const youtubedl = require('youtube-dl');
 
 let processQueue = (connection, queue) => {
+    if (queue.length == 0) return;
     let url = queue[0].query;
     let stream = youtubedl(url, ['--format=bestaudio']);
     console.log(url);
-    connection.play(stream);
+    connection.play(stream, { volume: 0.5});
     console.log('now playing: ', queue[0].title);
-    stream.on('end', () => {
-        console.warn('stream ended');
+
+    stream.on('error', (error) => {
+        throw error;
+    });
+
+    stream.on('end', (reason) => {
+        console.warn(`ended reason: ${reason}`);
         queue.shift();
         processQueue(connection, queue);
     });
@@ -22,8 +28,8 @@ module.exports = {
         if (!args.length) return;
         let user = message.member;
         let voice = user.voice;
-        let queue = message.client.musicQueue;
-        let isPlaying = queue.length != 0;
+        let { musicQueue } = message.client;
+        let isPlaying = musicQueue.length != 0;
 
         let query = args.join(' ');
         if (!query.includes('.com')) query = 'ytsearch1:' + query;
@@ -32,9 +38,11 @@ module.exports = {
         // get into
         youtubedl.getInfo(query, (err, info) => {
             if (err) throw err;
-            queue.push({
+            musicQueue.push({
                 query: query,
                 title: info.title,
+                requester: user,
+                info: info,
             });
 
             if (!voice.channel)
@@ -43,9 +51,8 @@ module.exports = {
             voice.channel.join().then((connection) => {
             // check if there is a queue
                 console.log(isPlaying);
-                console.log(queue);
-                if (!isPlaying) processQueue(connection, queue);
-                else message.channel.send(`Added ${queue[0].title} to the queue.`);
+                if (!isPlaying) processQueue(connection, musicQueue);
+                else message.channel.send(`Added ${musicQueue.slice(-1)[0].title} to the queue.`);
             });
         });
 

@@ -17,5 +17,8 @@ module.exports = {
     },
     helpEmbed(commandName, command) {
         return embeds.get('helpEmbed').createEmbed(commandName, command);
+    },
+    queueEmbed(queue) {
+        return embeds.get('queueEmbed').createEmbed(queue);
     }
 };

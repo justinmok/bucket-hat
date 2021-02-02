@@ -1,11 +1,20 @@
+const { queueEmbed } = require('../embeds/types.js');
+
+/* TODO:
+search in queue
+queue controls as reactions (remove, up, down, duplicate)
+*/
 module.exports = {
     name: 'queue',
     category: 'General',
-    description: 'get the queue of the music bot',
-    usage: '[@user]',
+    description: 'Sends a list of commands',
+    usage: '[position]',
+
     execute(message, args) {
-        let queue = message.client.musicQueue;
-        if (!queue.length) message.channel.send('The queue is empty.');
-        message.channel.send(queue[0].title);
-    }
+        const { musicQueue } = message.client;
+        if (args.length == 0) {
+            let embed = queueEmbed(musicQueue);
+            message.channel.send(embed);
+        } 
+    },
 };
