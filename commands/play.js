@@ -1,5 +1,6 @@
 const youtubedl = require('youtube-dl');
 
+
 let processQueue = (connection, queue) => {
     if (queue.length == 0) return;
     let url = queue[0].query;
@@ -7,7 +8,7 @@ let processQueue = (connection, queue) => {
     let stream = youtubedl(url);
     console.log('now playing: ', queue[0].title);
 
-    connection.play(stream, { passes: 3, bitrate: 'auto' })
+    connection.play(stream, { passes: 3, bitrate: 'auto', highWaterMark: 12 })
         .on('finish', () => {
             queue.shift();
             processQueue(connection, queue);

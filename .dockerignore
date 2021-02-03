@@ -1,0 +1,7 @@
+node_modules/*
+logs/*
+
+*.ogg
+*.mp3
+
+.eslintrc.json
