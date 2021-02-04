@@ -31,7 +31,8 @@
     "discord.js": "^12.5.1",
     "ffmpeg": "0.0.4",
     "uuid": "^8.3.2",
-    "youtube-dl": "^3.1.0"
+    "youtube-dl": "^3.1.0",
+    "ytdl-core-discord": "^1.2.5"
   },
   "devDependencies": {
     "eslint": "^7.14.0",

@@ -26,24 +26,28 @@ const queryParser = (query) => {
 
 };
 
+const getInfo = song => {
+    return new Promise(resolve => {
+        youtubedl.getInfo(song, (err, info) => {
+            resolve({
+                title: info.title,
+                info: info,
+            });
+        });
+    });
+};
+
 const processQuery = (query, message) => {
     return new Promise(resolve => {
         let { musicQueue } = message.client;
         queryParser(query).then(parsedQuery => {
-            console.log(parsedQuery);
-            for (const song of parsedQuery) {
-                youtubedl.getInfo(song, (err, info) => {
-                    if (err) throw err;
-                    musicQueue.push({
-                        query: query,
-                        title: info.title,
-                        requester: message.author,
-                        info: info,
-                    });
+            do {
+                console.log(parsedQuery[0]);
+                getInfo(parsedQuery.shift()).then(info => {
+                    musicQueue.push({...info, query, requester: message.author});
                     resolve(info);
                 });
-            }
-
+            } while (parsedQuery.length);
         }).catch(err => console.log(err));
 
     });
