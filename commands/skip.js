@@ -1,4 +1,4 @@
-const { processQueue } = require('./play.js');
+const { playQueue } = require('./utils/musicUtils.js');
 
 /* TODO:
 search in queue
@@ -17,6 +17,6 @@ module.exports = {
         let connection = message.client.voice.connections.entries().next().value[1];
         connection.dispatcher.end();
         musicQueue.shift();
-        processQueue(connection, musicQueue);
+        playQueue(connection, musicQueue);
     },
 };
