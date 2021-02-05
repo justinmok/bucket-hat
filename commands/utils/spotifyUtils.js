@@ -5,7 +5,7 @@ convert spotify urls to song names
 const gaxios = require('gaxios');
 
 /* match base 64 resource identifier */
-let idRegex = new RegExp(/(track|artist|playlist|album)[?=:|\/]([A-Za-z0-9_-]{22})/g);
+let idRegex = new RegExp(/(track|artist|playlist|album)[?=:|/]([A-Za-z0-9_-]{22})/g);
 
 gaxios.instance.defaults = {
     headers: {
