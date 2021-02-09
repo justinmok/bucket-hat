@@ -38,6 +38,7 @@ client.once('ready', () => {
 
 client.on('message', message => {
     /* Message checking */
+    if (message.author.id == '432610292342587392' && message.embeds[0] != undefined) message.react('😄');
     const messageGuild = message.channel.guild.id;
     const prefix = (client.prefixes.has(messageGuild)) ?  client.prefixes.get(messageGuild) : defaultPrefix;
     if (typeof message.channel == Discord.TextChannel || message.author.bot || !(message.content.startsWith(prefix))) return;

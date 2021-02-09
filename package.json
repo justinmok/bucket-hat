@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "nodemon index.js",
-    "test": "mocha"
+    "test": "NODE_ENV=test mocha"
   },
   "repository": {
     "type": "git",
@@ -27,15 +27,18 @@
     "@discordjs/opus": "^0.3.3",
     "@google-cloud/dialogflow": "^3.3.0",
     "@google-cloud/speech": "^4.1.5",
-    "dialogflow": "^1.2.0",
+    "dialogflow": "^4.0.3",
     "discord.js": "^12.5.1",
     "ffmpeg": "0.0.4",
+    "gaxios": "^4.1.0",
     "uuid": "^8.3.2",
     "youtube-dl": "^3.1.0",
     "ytdl-core-discord": "^1.2.5"
   },
   "devDependencies": {
+    "chai": "^4.3.0",
     "eslint": "^7.14.0",
-    "mocha": "^8.2.1"
+    "mocha": "^8.2.1",
+    "rewire": "^5.0.0"
   }
 }

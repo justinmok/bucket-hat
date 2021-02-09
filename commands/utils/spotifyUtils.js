@@ -3,13 +3,17 @@ convert spotify urls to song names
 */
 
 const gaxios = require('gaxios');
+const fs = require('fs');
 
+let config = require('../../config.json');
+
+const { spotifyToken } = config;
 /* match base 64 resource identifier */
 let idRegex = new RegExp(/(track|artist|playlist|album)[?=:|/]([A-Za-z0-9_-]{22})/g);
 
 gaxios.instance.defaults = {
     headers: {
-        Authorization: 'Bearer BQCwDOtRa6gMqaLALFeN2hUoG79KWEPq9hD-34axgdY0LkYs-qxIFJFkEr-DdyVqyvlMIS__55fPkQc-TBY'
+        Authorization: spotifyToken
     }
 };
 
@@ -26,22 +30,27 @@ const authenticate = () => {
                 Authorization: 'Basic NGNhZDEwMmI0ZWVhNGY5ZjlhNDIwMWYxMWVhOTljNTI6NTg5OTVlNmI4ZjMwNGYxNzkxYjQ1MWRlMzhiMjkxYWM='
             }
         }).then(response => {
+
             gaxios.instance.defaults.headers.Authorization = `Bearer ${response.data.access_token}`;
+            config = { ...config, spotifyToken };
+            console.log(config);
+            fs.writeFileSync('./config.json', JSON.stringify(config, null, 4));
             resolve(response.data.access_token);
         }).catch(err => console.log(err));
     });
 };
+
 const getPlaylistTracks = playlistId => {
     return new Promise(resolve => {
         gaxios.request({
             url: `https://api.spotify.com/v1/playlists/${playlistId}`,
             method: 'GET',
         }).then(response => {
-            if (response.status == 401) resolve(authenticate.then(() => getPlaylistTracks(playlistId)));
-            else { 
-                let tracks = response.data.tracks.items;
-                resolve(tracks.map(track => `ytsearch1: ${track.track.artists[0].name} - ${track.track.name}`));
-            }
+            let tracks = response.data.tracks.items;
+            resolve(tracks.map(track => `ytsearch1: ${track.track.artists[0].name} - ${track.track.name}`));
+        }).catch(err => {
+            if (err.code == 401) authenticate().then(() => resolve(getPlaylistTracks(playlistId)));
+            else throw err;
         });
     });
 
@@ -57,6 +66,7 @@ const getAlbumTracks = albumId => {
             resolve(tracks.map(track => `ytsearch1: ${track.artists[0].name} - ${track.name}`));
         }).catch(err => {
             if (err.code == 401) authenticate().then(() => resolve(getAlbumTracks(albumId)));
+            else throw err;
         });
     });
 };
@@ -67,10 +77,11 @@ const getTrackInfo = trackId => {
             url: `https://api.spotify.com/v1/tracks/${trackId}`,
             method: 'GET'
         }).then(response => {
-            if (response.status == 401) resolve(authenticate.then(() => getTrackInfo(trackId)));
-            console.log(response.data);
             resolve([`ytsearch1: ${response.data.artists[0].name} - ${response.data.name}`]);
-        }).catch(err => console.log(err));
+        }).catch(err => {
+            if (err.code == 401) authenticate().then(() => resolve(getTrackInfo(trackId)));
+            else throw err;
+        });
     });
 };
 
@@ -78,12 +89,15 @@ const getArtistTracks = artistId => {
     return new Promise(resolve => {
         gaxios.request({
             url: `https://api.spotify.com/v1/artists/${artistId}/top-tracks`,
-            method: 'GET'
+            method: 'GET',
+            params: { market: 'US' }
         }).then(response => {
-            if (response.status == 401) resolve(authenticate.then(() => getArtistTracks(artistId)));
-            let tracks = response.tracks;
+            let tracks = response.data.tracks;
             console.log(tracks);
             resolve(tracks.map(track => `ytsearch1: ${track.artists[0].name} - ${track.name}`));
+        }).catch(err => {
+            if (err.code == 401) authenticate().then(() => resolve(getArtistTracks(artistId)));
+            else throw err;
         });
     });
 };
@@ -98,7 +112,6 @@ const parseQuery = query => {
     /* return array containing track, playlist, artist, or album */
     return queries;
 };
-
 
 const parseSpotify = async (query) => {
     return new Promise(resolve => {
@@ -117,7 +130,7 @@ const parseSpotify = async (query) => {
                 case 'artist':
                     resolve(getArtistTracks(filtered.id));
                     break;
-                default: return;
+                default: resolve([]);
             }
         }
     });
