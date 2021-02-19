@@ -1,8 +1,7 @@
 const rewire = require('rewire');
 const chai = require('chai');
-const should = chai.should();
 
-const spotifyUtils = rewire('../commands/utils/spotifyUtils');
+const spotifyUtils = rewire('../commands/music/utils/spotifyUtils');
 
 
 describe('Spotify Utilities', function() {

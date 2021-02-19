@@ -1,20 +1,17 @@
 /*
-convert spotify urls to song names
+A utility set to convert spotify URLs to a clean 'Artist - Title' format
 */
 
 const gaxios = require('gaxios');
-const fs = require('fs');
 
 // todo: get rid of this
-let config = require('../../../config.json');
 
-const { spotifyToken } = config;
 /* match base 64 resource identifier */
 let idRegex = new RegExp(/(track|artist|playlist|album)[?=:|/]([A-Za-z0-9_-]{22})/g);
 
 gaxios.instance.defaults = {
     headers: {
-        Authorization: spotifyToken
+        Authorization: process.env.spotifyToken
     }
 };
 
@@ -31,11 +28,9 @@ const authenticate = () => {
                 Authorization: 'Basic NGNhZDEwMmI0ZWVhNGY5ZjlhNDIwMWYxMWVhOTljNTI6NTg5OTVlNmI4ZjMwNGYxNzkxYjQ1MWRlMzhiMjkxYWM='
             }
         }).then(response => {
-
-            gaxios.instance.defaults.headers.Authorization = `Bearer ${response.data.access_token}`;
-            config = { ...config, spotifyToken };
-            console.log(config);
-            fs.writeFileSync('./config.json', JSON.stringify(config, null, 4));
+            let accessToken = `Bearer ${response.data.access_token}`;
+            gaxios.instance.defaults.headers.Authorization = accessToken;
+            process.env.spotifyToken = accessToken;
             resolve(response.data.access_token);
         }).catch(err => console.log(err));
     });
@@ -108,8 +103,7 @@ const parseQuery = query => {
     let match;
     // eslint-disable-next-line no-cond-assign
     while (match = idRegex.exec(query)) queries.push({ type: match[1], id: match[2] });
-    console.log(query);
-    console.log(queries);
+
     /* return array containing track, playlist, artist, or album */
     return queries;
 };
@@ -117,7 +111,6 @@ const parseQuery = query => {
 const parseSpotify = async (query) => {
     return new Promise(resolve => {
         for (const filtered of parseQuery(query)) {
-            console.log(filtered);
             switch (filtered.type) {
                 case 'track':
                     resolve(getTrackInfo(filtered.id));
@@ -137,6 +130,7 @@ const parseSpotify = async (query) => {
     });
 
 };
+
 module.exports = {
     parseSpotify
 };
