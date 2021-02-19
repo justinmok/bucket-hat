@@ -2,7 +2,7 @@ const { playQueue, processQuery } = require('./utils/musicUtils');
 
 module.exports = {
     name: 'play',
-    category: 'General',
+    category: 'Music',
     description: 'Plays a youtube video in the vc lol',
     usage: '[youtube link]',
     playQueue,

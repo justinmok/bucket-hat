@@ -8,7 +8,7 @@ const shuffle = queue => {
 
 module.exports = {
     name: 'shuffle',
-    category: 'General',
+    category: 'Music',
     description: 'shuffles bot',
     usage: '',
     execute(message, args) {

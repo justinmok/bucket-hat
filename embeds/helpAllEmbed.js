@@ -10,12 +10,19 @@ module.exports = {
             .setTimestamp()
             .setFooter('Written by vibrant#0001');
 
-        let commandsList = [];
+        let sortedByCategory = new Discord.Collection();
         for (const command of commands) {
-            commandsList.push(`${command[1].name} - ${command[1].description}`);
+            let category = command[1].category;
+            // check if category exists
+            if (!(sortedByCategory.has(category))) sortedByCategory.set(category, []);
+            sortedByCategory.get(category).push(`• ${command[1].name}`);
         }
         
-        
-        return embed.addField('Commands', commandsList.join('\n')).addField('\u200B', ' See more about a specific command using `help [command]`');
+        for (const [k, v] of sortedByCategory) {
+            let numFields = embed.fields.length;
+            if (numFields % 3 == 0 && numFields > 0) embed.addField(k ,v.join('\n'), false);
+            else embed.addField(k, v.join('\n'), true);
+        }
+        return embed.addField('\u200B', ' See more about a specific command using `help [command]`');
     }
 };

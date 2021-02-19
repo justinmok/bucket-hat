@@ -9,7 +9,10 @@ module.exports = {
             .setTitle('Bot Documentation')
             .setThumbnail(pfpURL)
             .setTimestamp()
-            .setFooter('Written by vibrant#0001');
-        return embed.addField(`${commandName} command`, `Description: ${command.description}\nUsage: ${command.usage}`);
+            .setFooter('Written by vibrant#0001')
+            .addField(`${commandName} command`, `${command.description}`)
+            .addField('Usage', `\`${command.usage}\``);
+        
+        return embed;
     }
 };

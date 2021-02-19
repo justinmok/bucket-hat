@@ -8,7 +8,7 @@ module.exports = {
 
     execute(message, args) {
         const { commands } = message.client;
-        if (args.length == 0) {
+        if (!(args) || !(args.length)) {
             let embed = helpAllEmbed(commands);
             message.channel.send(embed);
         } else {

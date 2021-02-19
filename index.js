@@ -31,7 +31,6 @@ for (const folder of commandsFolder) {
     const commandFiles = fs.readdirSync(`./commands/${folder}`).filter(file => file.endsWith('.js'));
     for (const file of commandFiles) {
         const command = require(`./commands/${folder}/${file}`);
-        console.log(command);
         client.commands.set(command.name, command);
     }
 }
@@ -58,7 +57,6 @@ client.on('message', message => {
 
     /* Update prefixes */
     client.prefixes.forEach((guild, prefix) => prefixes[prefix] = guild);
-    console.warn(prefixes);
     fs.writeFileSync('./prefixes.json', JSON.stringify(prefixes, null, 4));
 
     /* Execute command */

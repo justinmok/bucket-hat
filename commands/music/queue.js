@@ -6,7 +6,7 @@ queue controls as reactions (remove, up, down, duplicate)
 */
 module.exports = {
     name: 'queue',
-    category: 'General',
+    category: 'Music',
     description: 'Sends a list of commands',
     usage: '[position]',
 

@@ -1,13 +1,16 @@
 module.exports = {
     name: 'eval',
-    category: 'admin',
-    description: 'fuck up my pc',
+    category: 'Admin',
+    usage: 'eval [js expression]',
+    description: 'Evaluates Javascript expressions',
     execute(message, args) {
+        let client = message.client;
         try {
-            const evaled = eval(args.join(' '));
+            let evaled = eval(args.join(' '));
+            evaled = require('util').inspect(evaled);
             message.channel.send(`\`\`\`js\n${evaled}\`\`\``);
         } catch (error) {
-            message.channel.send('fuck tehre was na error oopsie' + error);
+            message.channel.send(`An error occured when evaluating expression: \`\`\`\n${error}\`\`\``);
         }
     }
 };
