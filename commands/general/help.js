@@ -1,4 +1,4 @@
-const { helpAllEmbed, helpEmbed } = require('../embeds/types.js');
+const { helpAllEmbed, helpEmbed } = require('../../embeds/types.js');
 
 module.exports = {
     name: 'help',

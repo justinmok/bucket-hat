@@ -1,4 +1,4 @@
-const { playQueue } = require('./utils/musicUtils.js');
+const { playQueue } = require('./utils/musicUtils');
 
 /* TODO:
 search in queue

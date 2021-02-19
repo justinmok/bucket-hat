@@ -5,7 +5,8 @@ convert spotify urls to song names
 const gaxios = require('gaxios');
 const fs = require('fs');
 
-let config = require('../../config.json');
+// todo: get rid of this
+let config = require('../../../config.json');
 
 const { spotifyToken } = config;
 /* match base 64 resource identifier */

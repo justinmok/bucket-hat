@@ -1,4 +1,4 @@
-const { queueEmbed } = require('../embeds/types.js');
+const { queueEmbed } = require('../../embeds/types.js');
 
 /* TODO:
 search in queue

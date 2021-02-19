@@ -26,11 +26,17 @@ for (const [server, prefix] of Object.entries(prefixes)) {
     client.prefixes.set(server, prefix);
 }
 
-let commandsDir = fs.readdirSync('./commands').filter(file => file.endsWith('.js'));
-for (const file of commandsDir) {
-    const command = require(`./commands/${file}`);
-    client.commands.set(command.name, command);
+let commandsFolder = fs.readdirSync('./commands').filter(dir => !dir.includes('utils'));
+for (const folder of commandsFolder) {
+    const commandFiles = fs.readdirSync(`./commands/${folder}`).filter(file => file.endsWith('.js'));
+    for (const file of commandFiles) {
+        const command = require(`./commands/${folder}/${file}`);
+        console.log(command);
+        client.commands.set(command.name, command);
+    }
 }
+
+console.log(`Loaded ${client.commands.size} commands.`);
 
 client.once('ready', () => {
     console.log(`Succesfully logged into ${client.user.tag}`);
