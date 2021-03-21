@@ -1,14 +1,13 @@
 /*
 todo: dockerize, permissions based commands, categorize help menu, help menu pagination, AI stop session intent
 */
-
 const Discord = require('discord.js');
 const fs = require('fs');
 
 //const speech = require('@google-cloud/speech');
 
-let config = require('./config.json');
-let prefixes = require('./prefixes.json');
+let config = require('../config.json');
+let prefixes = require('../prefixes.json');
 
 const { token, defaultPrefix, cloudProjectID } = config;
 
@@ -26,11 +25,11 @@ for (const [server, prefix] of Object.entries(prefixes)) {
     client.prefixes.set(server, prefix);
 }
 
-let commandsFolder = fs.readdirSync('./commands').filter(dir => !dir.includes('utils'));
+let commandsFolder = fs.readdirSync('./src/commands').filter(dir => !dir.includes('utils'));
 for (const folder of commandsFolder) {
-    const commandFiles = fs.readdirSync(`./commands/${folder}`).filter(file => file.endsWith('.js'));
+    const commandFiles = fs.readdirSync(`./src/commands/${folder}`).filter(file => file.endsWith('.js'));
     for (const file of commandFiles) {
-        const command = require(`./commands/${folder}/${file}`);
+        const command = require(`./src/commands/${folder}/${file}`);
         client.commands.set(command.name, command);
     }
 }
