@@ -1,7 +1,8 @@
 const Discord = require('discord.js');
 const fs = require('fs');
 
-const embedDir = fs.readdirSync('./embeds/').filter(file => file.endsWith('.js'));
+const embedDir = fs.readdirSync('./embeds').filter(file => file.endsWith('.js'));
+
 let embeds = new Discord.Collection();
 
 for (const file of embedDir) {

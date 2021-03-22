@@ -1,5 +1,5 @@
 const Discord = require('discord.js');
-const { pfpURL } = require('../config.json');
+const { pfpURL } = require('../../config.json');
 
 module.exports = {
     name: 'helpEmbed',

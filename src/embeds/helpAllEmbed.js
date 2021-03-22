@@ -1,5 +1,7 @@
 const Discord = require('discord.js');
-const { pfpURL } = require('../config.json');
+
+// todo: fix these relative paths
+const { pfpURL } = require('../../config.json');
 module.exports = {
     name: 'helpAllEmbed',
     createEmbed(commands) {

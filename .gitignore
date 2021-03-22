@@ -1,6 +1,10 @@
 # node modules lol
 node_modules/*
 logs/*
+build/*
+.vscode/*
+
+prefixes.json
 
 # random audio files for testing
 *.ogg

@@ -13,5 +13,5 @@ RUN apk del .build-deps
 
 COPY . .
 
-CMD ["node", "index.js"]
+CMD ["npm", "start"]
 # todo: healthcheck
