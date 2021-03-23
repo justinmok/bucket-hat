@@ -1,22 +1,13 @@
-import type { Message, VoiceConnection, GuildMember, Client} from "discord.js";
+import type { Message, VoiceConnection } from "discord.js";
 import type { Video, Result } from "ytsr";
+import type { ClientWithMusic, QueueItem } from '../../../../typings/index';
 
 // match youtube regex
 const ytdl = require('ytdl-core-discord');
-const { parseSpotify } = require('./spotifyUtils');
+//const { parseSpotify } = require('./spotifyUtils');
 const ytRegex = /(youtu\.be|youtube\.com)/;
 
 const ytsr = require('ytsr');
-
-interface ClientWithMusic extends Client {
-    musicQueue: Array<QueueItem>;
-}
-
-interface QueueItem {
-    match: Video,
-    query: string,
-    requester: GuildMember | null
-}
 
 const search = (query: string): Promise<Array<Video>> => {
     return new Promise<Array<Video>>((resolve, reject)=> {
@@ -44,8 +35,8 @@ const playQueue = async (connection: VoiceConnection, queue: Array<QueueItem>) =
 
 const queryParser = (query: string): Promise<Array<string>> => {
     return new Promise(resolve => {
-        if (query.includes('spotify')) parseSpotify(query).then(songs => resolve(songs));
-        else if (!(ytRegex.test(query))) resolve([`ytsearch1: + ${query}`]);
+        //if (query.includes('spotify')) parseSpotify(query).then(songs => resolve(songs));
+        if (!(ytRegex.test(query))) resolve([`ytsearch1: + ${query}`]);
         else resolve(new Array(query));
     });
 

@@ -1,4 +1,7 @@
-const { queueEmbed } = require('../../embeds/types.js');
+import { Message } from "discord.js";
+import { ClientWithMusic } from "../../../typings";
+
+const { queueEmbed } = require('../../embeds/types');
 
 /* TODO:
 search in queue
@@ -10,8 +13,9 @@ module.exports = {
     description: 'Sends a list of commands',
     usage: '[position]',
 
-    execute(message, args) {
-        const { musicQueue } = message.client;
+    execute(message: Message, args: string[]) {
+        console.log(typeof queueEmbed);
+        const { musicQueue } = message.client as ClientWithMusic;
         if (!musicQueue.length) return;
         if (args.length == 0) {
             let embed = queueEmbed(musicQueue);

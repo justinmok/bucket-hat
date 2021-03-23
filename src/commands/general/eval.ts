@@ -1,9 +1,11 @@
+import { Message } from "discord.js";
+
 module.exports = {
     name: 'eval',
     category: 'Admin',
     usage: 'eval [js expression]',
     description: 'Evaluates Javascript expressions',
-    execute(message, args) {
+    execute(message: Message, args: string[]) {
         let client = message.client;
         try {
             let evaled = eval(args.join(' '));
