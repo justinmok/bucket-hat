@@ -16,10 +16,13 @@ module.exports = {
         let sortedByCategory: Discord.Collection<string, Array<String>> = new Discord.Collection();
         for (const command of commands) {
             let category = command[1].category;
+            
             // check if category exists
-            if (sortedByCategory.get(category) === undefined) sortedByCategory.set(category, []);
+            if (!(sortedByCategory.has(category))) sortedByCategory.set(category, []);
             // @ts-expect-error how do i get rid of this
-            else sortedByCategory.get(category).push(`• ${command[1].name}`);
+            sortedByCategory.get(category).push(`• ${command[1].name}`);
+
+        
         }
         
         for (const [k, v] of sortedByCategory) {

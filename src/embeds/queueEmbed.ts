@@ -4,7 +4,7 @@ import type { QueueItem } from '../../typings/index';
 module.exports = {
     name: 'queueEmbed',
     createEmbed(queue: Array<QueueItem>) {
-        let { url } = queue[0].match.bestThumbnail;
+        let { url } = queue[0].match.thumbnails[0];
         let embed = new Discord.MessageEmbed()
             .setColor('#dddddd')
             .setTitle('Music Queue')

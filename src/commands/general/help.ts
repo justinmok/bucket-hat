@@ -1,5 +1,5 @@
 import { Message } from "discord.js";
-import { ClientWithCommands } from "../../../typings";
+import { BotClient } from "../../../typings";
 
 const { helpAllEmbed, helpEmbed } = require('../../embeds/types.js');
 
@@ -10,7 +10,7 @@ module.exports = {
     usage: '[command name]',
 
     execute(message: Message, args: string[]) {
-        const { commands } = message.client as ClientWithCommands;
+        const { commands } = message.client as BotClient;
         if (!(args) || !(args.length)) {
             let embed = helpAllEmbed(commands);
             message.channel.send(embed);

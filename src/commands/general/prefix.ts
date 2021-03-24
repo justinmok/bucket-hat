@@ -1,6 +1,6 @@
 module.exports = {
     name: 'prefix',
-    category: 'admin',
+    category: 'Admin',
     description: 'View or modify the server bot prefix',
     usage: 'prefix [prefix]',
     execute(message, args) {

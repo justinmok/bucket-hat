@@ -1,16 +1,20 @@
 import type * as Discord from 'discord.js';
 import type * as ytsr from "ytsr";
 
-interface ClientWithMusic extends Discord.Client {
-    musicQueue: MusicQueue;
+interface BotClient extends Discord.Client {
+    defaultPrefix: string,
+    commands: Discord.Collection<string, DiscordCommand>,
+    musicQueue: MusicQueue,
+    prefixes: Discord.Collection<string, string>,
+    cloudProjectId?: string,
 }
 
-interface ClientWithCommands extends Discord.Client {
-    commands: Discord.Collection<string, DiscordCommand>
+interface VideoResult extends Omit<ytsr.Video, 'bestThumbnail' | 'author' | 'isUpcoming' | 'views' |'isLive' | 'badges' | 'isComing' | 'upcoming' | 'uploadedAt' | 'description'> {
+    
 }
 
 interface QueueItem {
-    match: ytsr.Video,
+    match: VideoResult,
     query: string,
     requester: Discord.GuildMember | null
 }
@@ -29,3 +33,5 @@ interface DiscordCommand {
     description: string,
     execute(...args): any
 }
+
+type BotCommands = Discord.Collection<string, DiscordCommand>;

@@ -1,5 +1,5 @@
 import type { Message } from 'discord.js';
-import { ClientWithMusic } from '../../../typings';
+import { BotClient } from '../../../typings';
 
 module.exports = {
     name: 'remove',
@@ -8,7 +8,7 @@ module.exports = {
     usage: '[position]',
 
     execute(message: Message, args: string[]) {
-        let { musicQueue } = message.client as ClientWithMusic;
+        let { musicQueue } = message.client as BotClient;
         if (!musicQueue.length) return;
         if (args.length == 0) return message.channel.send('Specify an item in the queue to remove.');
         let queuePos = parseInt(args[0]) - 1;

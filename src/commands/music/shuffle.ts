@@ -1,5 +1,5 @@
 import { Message } from "discord.js";
-import { ClientWithMusic, MusicQueue } from "../../../typings";
+import { BotClient, MusicQueue } from "../../../typings";
 
 // durstenfeld shuffle
 const shuffle = (queue: MusicQueue): void => {
@@ -15,7 +15,7 @@ module.exports = {
     description: 'shuffles bot',
     usage: '',
     execute(message: Message, args: string[]) {
-        let { musicQueue } = message.client as ClientWithMusic;
+        let { musicQueue } = message.client as BotClient;
         /* keep first song */
         let temp = musicQueue.shift();
         shuffle(musicQueue);

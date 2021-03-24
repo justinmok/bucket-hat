@@ -1,4 +1,4 @@
-import type { Video } from "ytsr";
+import { VideoResult } from "../../../typings";
 
 const { playQueue, processQuery } = require('./utils/musicUtils');
 
@@ -21,7 +21,7 @@ module.exports = {
         let query = args.join(' ');
 
         voice.channel.join().then((connection) => {
-            processQuery(query, message).then((info: Video) => {
+            processQuery(query, message).then((info: VideoResult) => {
                 if (!isPlaying) {
                     message.channel.send(`Now playing ${info.title} in ${voice.channel.name}`);
                     playQueue(connection, musicQueue);

@@ -1,23 +1,36 @@
 import type { Message, VoiceConnection } from "discord.js";
-import type { Video, Result } from "ytsr";
-import type { ClientWithMusic, QueueItem } from '../../../../typings/index';
+import type { Result } from "ytsr";
+import type { BotClient, QueueItem, VideoResult } from '../../../../typings/index';
+import { getInfo } from 'ytdl-core';
 
-// match youtube regex
 const ytdl = require('ytdl-core-discord');
-//const { parseSpotify } = require('./spotifyUtils');
 const ytRegex = /(youtu\.be|youtube\.com)/;
-
 const ytsr = require('ytsr');
 
-const search = (query: string): Promise<Array<Video>> => {
-    return new Promise<Array<Video>>((resolve, reject)=> {
+const search = (query: string, resultCount: number = 1): Promise<Array<VideoResult>> => {
+    return new Promise<Array<VideoResult>>(async (resolve, reject)=> {
+        if (query.match(ytRegex)) resolve([await parseUrl(query)]);
         ytsr.getFilters(query).then(async filters => {
             let filter = await filters.get('Type').get('Video');
-            let results: Result = await ytsr(filter.url, {limit: 5});
+            let results: Result = await ytsr(filter.url, {limit: resultCount});
 
-            resolve(<Video[]>results.items);
+            resolve(<VideoResult[]>results.items);
         })
 
+    });
+}
+
+const parseUrl = (query: string): Promise<VideoResult> => {
+    return new Promise<VideoResult>(async (resolve, reject) => {
+        let videoDetails = await (await getInfo(query)).player_response.videoDetails;
+        resolve({
+            type: 'video',
+            title: videoDetails.title,
+            id: videoDetails.videoId,
+            url: `https://youtube.com/watch?id=${videoDetails.videoId}`,
+            thumbnails: videoDetails.thumbnail.thumbnails,
+            duration: videoDetails.lengthSeconds
+        } as VideoResult)
     });
 }
 
@@ -33,29 +46,19 @@ const playQueue = async (connection: VoiceConnection, queue: Array<QueueItem>) =
         }).on('error', error => console.error(error));
 };
 
-const queryParser = (query: string): Promise<Array<string>> => {
-    return new Promise(resolve => {
-        //if (query.includes('spotify')) parseSpotify(query).then(songs => resolve(songs));
-        if (!(ytRegex.test(query))) resolve([`ytsearch1: + ${query}`]);
-        else resolve(new Array(query));
-    });
-
-};
-
-const processQuery = (query: string, message: Message): Promise<Video> => {
-    return new Promise<Video>((resolve, reject) => {
-
-        // hacky fix lol
-        let { musicQueue } = message.client as ClientWithMusic;
-        search(query).then(results => {
+const processQuery = (query: string, message: Message): Promise<VideoResult> => {
+    return new Promise<VideoResult>(async (resolve, reject) => {
+        let { musicQueue } = message.client as BotClient;
+        search(query).then(result => {
             let addToQueue: QueueItem = {
-                match: results[0],
-                query: query,
-                requester: message.member,
-            }
-            musicQueue.push(addToQueue);
-            resolve(results[0]);
+            match: result[0],
+            query: query,
+            requester: message.member,
+        }
+        musicQueue.push(addToQueue);
+        resolve(result[0]);
         })
+        
     });
 };
 

@@ -13,7 +13,6 @@ module.exports = {
             .setTimestamp()
             .addField(`${commandName} command`, `${command.description}`)
             .addField('Usage', `\`${command.usage}\``);
-        
         return embed;
     }
 };

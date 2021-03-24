@@ -23,7 +23,7 @@ async function replyMsg(msg, session, projectID) {
 
 module.exports = {
     name: 'ai',
-    category: 'General',
+    category: 'Experimental',
     description: 'Start a conversation with a Google-provided AI',
     usage: 'ai start',
     execute(message, args) {

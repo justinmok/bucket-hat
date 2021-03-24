@@ -1,5 +1,5 @@
 import { Message } from "discord.js";
-import { ClientWithMusic } from "../../../typings";
+import { BotClient } from "../../../typings";
 
 const { queueEmbed } = require('../../embeds/types');
 
@@ -14,8 +14,7 @@ module.exports = {
     usage: '[position]',
 
     execute(message: Message, args: string[]) {
-        console.log(typeof queueEmbed);
-        const { musicQueue } = message.client as ClientWithMusic;
+        const { musicQueue } = message.client as BotClient;
         if (!musicQueue.length) return;
         if (args.length == 0) {
             let embed = queueEmbed(musicQueue);
