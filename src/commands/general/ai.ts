@@ -1,6 +1,3 @@
-const dialogFlow = require('@google-cloud/dialogflow');
-const uuid = require('uuid');
-
 async function replyMsg(msg, session, projectID) {
     const sessionClient = new dialogFlow.SessionsClient();
     const sessionPath = await sessionClient.projectAgentSessionPath(projectID, session);
