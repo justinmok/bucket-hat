@@ -28,7 +28,7 @@ module.exports = {
         for (const [k, v] of sortedByCategory) {
             let numFields = embed.fields.length;
             if (numFields % 3 == 0 && numFields > 0) embed.addField(k ,v.join('\n'), false);
-            else embed.addField(k, v.join('\n'), true);
+            else embed.addField(k, v.join(' '), true);
         }
         return embed.addField('\u200B', ' See more about a specific command using `help [command]`');
     }

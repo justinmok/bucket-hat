@@ -3,6 +3,7 @@
       "outDir": "./build",
       "allowJs": true,
       "target": "ES6",
+      "types": ["node"],
       "strictNullChecks": true,
       "module": "CommonJS",
       "sourceMap": true
