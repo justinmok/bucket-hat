@@ -46,21 +46,18 @@ client.once('ready', () => {
 client.on('message', message => {
 
     /* Get the guild ID */
-    let messageGuild: string; 
-    if (message.guild) messageGuild = message.guild.id;
-    else return;
+    let messageGuild = message.guild?.id ?? '';
 
     /* Get the prefix for the guild */
-    const prefix = (client.prefixes.has(messageGuild)) ?  client.prefixes.get(messageGuild) : defaultPrefix;
+    const prefix = client.prefixes.get(messageGuild) ?? defaultPrefix;
 
     /* Message checks */
-    if (message.author.bot || !(message.content.startsWith(prefix))) return;
+    if (message.author.bot || !(messageGuild) || !(message.content.startsWith(prefix))) return;
     if (message.author.id == '432610292342587392' && message.embeds[0] != undefined) message.react('😄');
     
     /* Retrieving command info */
     const args = message.content.slice(prefix.length).trim().split(/ +/);
-    // @ts-expect-error fix this later
-    const command = args.shift().toLowerCase();
+    const command = args.shift()?.toLowerCase() ?? '';
 
     /* Command does not exist */
     if (!client.commands.has(command)) return;
@@ -71,8 +68,7 @@ client.on('message', message => {
 
     /* Execute command */
     try {
-        // @ts-expect-error fix this later
-        client.commands.get(command).execute(message, args);
+        client.commands.get(command)?.execute(message, args);
     } catch (error) {
         console.log(error);
 
