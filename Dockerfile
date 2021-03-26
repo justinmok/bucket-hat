@@ -9,6 +9,7 @@ COPY package*.json ./
 
 RUN apk add --no-cache --virtual .build-deps make gcc g++
 RUN npm install --silent
+RUN npm install -g typescript
 RUN apk del .build-deps
 
 COPY . .
