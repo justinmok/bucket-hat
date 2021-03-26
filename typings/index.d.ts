@@ -34,4 +34,21 @@ interface DiscordCommand {
     execute(...args): any
 }
 
+interface MinecraftResponse {
+    description: {
+        text: string
+    },
+    players: {
+        max: number,
+        online: number,
+        sample?: [ name: string, id: string ]
+    }
+    version: {
+        name: string,
+        protocol: number,
+    }
+    favicon?: string,
+    ping: number,
+}
+
 type BotCommands = Discord.Collection<string, DiscordCommand>;
