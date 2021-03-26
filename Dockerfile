@@ -13,5 +13,7 @@ RUN apk del .build-deps
 
 COPY . .
 
+RUN tsc -p ./tsconfig.json
+
 CMD ["npm", "start"]
 # todo: healthcheck
