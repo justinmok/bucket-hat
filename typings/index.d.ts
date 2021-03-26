@@ -35,8 +35,24 @@ interface DiscordCommand extends Discord.ApplicationCommand {
     execute(...args): any
 }
 
-type BotCommands = Discord.Collection<string, DiscordCommand>;
+interface MinecraftResponse {
+    description: {
+        text: string
+    },
+    players: {
+        max: number,
+        online: number,
+        sample?: [ name: string, id: string ]
+    }
+    version: {
+        name: string,
+        protocol: number,
+    }
+    favicon?: string,
+    ping: number,
+}
 
+type BotCommands = Discord.Collection<string, DiscordCommand>;
 interface geminiResponse {
     symbol: string,
     open: string,
