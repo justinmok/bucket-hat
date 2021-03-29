@@ -27,7 +27,7 @@ const parseUrl = (query: string): Promise<VideoResult> => {
             type: 'video',
             title: videoDetails.title,
             id: videoDetails.videoId,
-            url: `https://youtube.com/watch?id=${videoDetails.videoId}`,
+            url: `https://youtube.com/watch?v=${videoDetails.videoId}`,
             thumbnails: videoDetails.thumbnail.thumbnails,
             duration: videoDetails.lengthSeconds
         } as VideoResult)
