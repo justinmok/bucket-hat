@@ -1,3 +1,4 @@
+import type { BotClient } from '../../../typings/index';
 const { playQueue } = require('./utils/musicUtils');
 
 /* TODO:
@@ -11,11 +12,10 @@ module.exports = {
     usage: 'skip',
 
     execute(message) {
-        const { musicQueue } = message.client;
-        if (!message.client.voice.connections) return;
-        if (musicQueue.length == 0) return;
-        let connection = message.client.voice.connections.entries().next().value[1];
-        connection.dispatcher.end();
+        let client = message.client as BotClient;
+        let { musicQueue } = client;
+        let connection = client.voice?.connections.get(message.guild.id);
+        connection?.dispatcher.end();
         musicQueue.shift();
         playQueue(connection, musicQueue);
     },
