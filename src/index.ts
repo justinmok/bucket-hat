@@ -1,59 +1,43 @@
 /*
-todo: dockerize, permissions based commands, categorize help menu, help menu pagination, AI stop session intent
+todo: permissions based commands
 */
-const Discord = require('discord.js');
-const fs = require('fs');
+import * as Discord from 'discord.js'
+import * as fs from 'fs';
+import * as cron from 'node-cron'
+import { queryConfig, queryPrefixes, getCommands} from './util'
 
 import type { BotClient } from '../typings/index';
 
-//const speech = require('@google-cloud/speech');
-
-let config = require('../config.json');
-let prefixes = require('../prefixes.json');
-
-const { token, defaultPrefix, cloudProjectID } = config;
-
 const client = new Discord.Client() as BotClient;
-//const speechClient = new speech.SpeechClient();
-
-client.defaultPrefix = defaultPrefix;
-client.commands = new Discord.Collection();
+client.commands = new Map();
 client.prefixes = new Discord.Collection();
 client.musicQueue = [];
-client.cloudProjectId = cloudProjectID;
 
+// fetch prefixes
+queryPrefixes().then(prefixes => {
+    for (const [k, v] of prefixes) client.prefixes.set(k,v);
+});
 
-for (const [server, prefix] of Object.entries(prefixes)) {
-    client.prefixes.set(server, <string>prefix);
-}
-
-let commandsFolder = fs.readdirSync('./commands').filter(dir => !dir.includes('utils'));
-for (const folder of commandsFolder) {
-    const commandFiles = fs.readdirSync(`./commands/${folder}`).filter(file => file.endsWith('.js'));
-    for (const file of commandFiles) {
-        const command = require(`./commands/${folder}/${file}`);
-        client.commands.set(command.name, command);
-    }
-}
-
-console.log(`Loaded ${client.commands.size} commands.`);
+getCommands().then(commands => {
+    client.commands = commands;
+});
 
 client.once('ready', () => {
     if (client.user)
     console.log(`Succesfully logged into ${client.user.tag}`);
+    console.log(`Loaded ${client.commands.size} commands.`);
 });
 
 client.on('message', message => {
-
     /* Get the guild ID */
     let messageGuild = message.guild?.id ?? '';
 
     /* Get the prefix for the guild */
-    const prefix = client.prefixes.get(messageGuild) ?? defaultPrefix;
+    const prefix = client.prefixes.get(messageGuild) ?? client.defaultPrefix;
 
     /* Message checks */
-    if (message.author.bot || !(messageGuild) || !(message.content.startsWith(prefix))) return;
     if (message.author.id == '432610292342587392' && message.embeds[0] != undefined) message.react('😄');
+    if (message.author.bot || !(messageGuild) || !(message.content.startsWith(prefix))) return;
     
     /* Retrieving command info */
     const args = message.content.slice(prefix.length).trim().split(/ +/);
@@ -62,10 +46,6 @@ client.on('message', message => {
     /* Command does not exist */
     if (!client.commands.has(command)) return;
 
-    /* Update prefixes */
-    client.prefixes.forEach((guild, prefix) => prefixes[prefix] = guild);
-    fs.writeFileSync('../prefixes.json', JSON.stringify(prefixes, null, 4));
-
     /* Execute command */
     try {
         client.commands.get(command)?.execute(message, args);
@@ -73,11 +53,27 @@ client.on('message', message => {
         console.log(error);
 
         /* User feedback, logs error to file */
-        message.channel.send(`OOPSIE WOOPSIE!! Uwu We make a fucky wucky!! A wittle fucko boingo! The code monkeys at our headquarters are working VEWY HAWD to fix this! There was an error executing \`${command}\`.\nStacktrace: \`\`\`${error.stack}\`\`\``).then(() => {
+        message.channel.send(`OOPSIE WOOPSIE!! Uwu We make a fucky wucky!! A wittle fucko boingo! The code monkeys <@148521718388883456> at our headquarters are working VEWY HAWD to fix this! There was an error executing \`${command}\`.\nStacktrace: \`\`\`${error.stack}\`\`\``).then(() => {
             fs.writeFileSync(`./logs/${Date.now()}.error.log`, error);
         });
     }
 });
 
-console.log(`Logging in with token ***********${token.slice(-8)}`);
-client.login(token);
+/* Update prefixes every minute 
+cron.schedule('* * * * *', () => {
+    client.prefixes.forEach((guild, prefix) => prefixes[prefix] = guild);
+    fs.writeFileSync('../prefixes.json', JSON.stringify(prefixes, null, 4));
+});
+*/
+
+cron.schedule('0 * * * *', () => {
+
+});
+
+queryConfig().then(config => {
+    let token = config.token;
+    client.defaultPrefix = config.defaultPrefix;
+    if (process.env.NODE_ENV == 'dev') token = config.testToken;
+    console.log(`Logging in with token ***********${token.slice(-8)}`);
+    client.login(token);
+});

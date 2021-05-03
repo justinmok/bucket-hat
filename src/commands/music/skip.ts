@@ -15,6 +15,7 @@ module.exports = {
         let client = message.client as BotClient;
         let { musicQueue } = client;
         let connection = client.voice?.connections.get(message.guild.id);
+        if (!connection || !(connection.dispatcher)) return;
         connection?.dispatcher.end();
         musicQueue.shift();
         playQueue(connection, musicQueue);
