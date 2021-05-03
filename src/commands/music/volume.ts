@@ -1,4 +1,5 @@
 import type { BotClient } from '../../../typings/index';
+import { updateVolume } from '../../util';
 
 module.exports = {
     name: 'volume',
@@ -11,6 +12,7 @@ module.exports = {
         let volume = parseInt(args[0]) / 100;
         if (!volume) return;
         
+        updateVolume(message.guildId, volume);
         client.voice?.connections.get(message.guild.id)?.dispatcher.setVolume(volume);
     },
 };

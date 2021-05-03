@@ -1,6 +1,7 @@
 import { Firestore } from '@google-cloud/firestore';
 import type { Message} from 'discord.js';
 import { BotClient } from '../../../typings';
+import { updatePrefix } from '../../util';
 
 const db = new Firestore({
     projectId: 'keylimepie',
@@ -31,7 +32,12 @@ module.exports = {
                     collector.on('collect', msg => {
                         if (/^(yes)|^(ya)|(^y$)/gi.test(msg.content)) {
                             client.prefixes.set(guildId, prefix);
-                            db.doc('config/prefixes').update({guildId: prefix});
+                            try {
+                                updatePrefix(guildId, prefix);
+                            }
+                            catch (e) {
+                                message.reply(`Could not update prefixes on database:\`\`\`\n${e}\n\`\`\``);
+                            }
                             msg.react('👍');
                             collector.stop('changed');
                         } else return;
