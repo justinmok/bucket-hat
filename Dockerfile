@@ -7,7 +7,7 @@ COPY --from=0 / /
 
 COPY package*.json ./
 
-RUN apk add --no-cache --virtual .build-deps make gcc g++
+RUN apk add --no-cache --virtual .build-deps make gcc g++ automake libtool-bin
 RUN npm install --silent
 RUN npm install -g typescript
 RUN apk del .build-deps
