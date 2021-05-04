@@ -1,9 +1,19 @@
 import { Firestore } from '@google-cloud/firestore';
+import { request } from 'gaxios';
+
 import * as fs from 'fs';
 
-import type { BotConfig, DiscordCommand } from '../typings/index';
+import type { BotConfig, DiscordCommand, cryptoInfo } from '../typings/index';
 
 type prefixMap = Map<string, string>;
+
+interface sochainResponse {
+    success: boolean,
+    data: {
+        network: string,
+        prices: cryptoInfo[]
+    }
+}
 
 const db = new Firestore({
     projectId: 'keylimepie',
@@ -72,3 +82,18 @@ export const getCommands = (): Promise<Map<string, DiscordCommand>> => {
         resolve(commandsCollection);
     });
 }
+
+export const queryCrypto = (ticker: string, base: string = 'USD', exchange: string = 'binance'): Promise<cryptoInfo> => {
+    return new Promise<cryptoInfo>((resolve, reject) => {
+        console.log(`Sending request to https://sochain.com/api/v2/get_price/${ticker}/${base}`);
+        request({
+            url: `https://sochain.com/api/v2/get_price/${ticker}/${base}`
+        }).then(res => {
+            if (res.status != 200) reject('Request failed');
+            let data = res.data as sochainResponse;
+            let prices = data.data.prices;
+            if (data.data.network != ticker) reject(`Invalid ticker: ${ticker}`);
+            for (const price of prices) if (price.price > 0.001) resolve({...price, 'ticker': ticker});
+        }).catch(e => reject(e));
+    });
+};

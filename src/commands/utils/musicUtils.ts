@@ -1,6 +1,6 @@
 import type { Message, VoiceConnection } from "discord.js";
 import type { Result } from "ytsr";
-import type { BotClient, QueueItem, VideoResult } from '../../../../typings/index';
+import type { BotClient, QueueItem, VideoResult } from '../../../typings/index';
 import { getInfo } from 'ytdl-core';
 
 const ytdl = require('ytdl-core-discord');

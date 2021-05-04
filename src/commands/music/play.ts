@@ -1,7 +1,7 @@
 import type { BotClient, VideoResult } from "../../../typings";
 import { getVolume } from "../../util";
 
-const { playQueue, processQuery } = require('./utils/musicUtils');
+const { playQueue, processQuery } = require('../utils/musicUtils');
 
 module.exports = {
     name: 'play',

@@ -41,3 +41,11 @@ interface DiscordCommand {
 }
 
 type BotCommands = Discord.Collection<string, DiscordCommand>;
+
+interface cryptoInfo {
+    price: number,
+    price_base: string,
+    ticker: string,
+    exchange: string,
+    time: number
+}

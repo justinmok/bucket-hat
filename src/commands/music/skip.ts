@@ -1,5 +1,5 @@
 import type { BotClient } from '../../../typings/index';
-const { playQueue } = require('./utils/musicUtils');
+const { playQueue } = require('../utils/musicUtils');
 
 /* TODO:
 search in queue
