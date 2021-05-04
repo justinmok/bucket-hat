@@ -37,14 +37,14 @@ const parseUrl = (query: string): Promise<VideoResult> => {
 const playQueue = async (connection: VoiceConnection, queue: Array<QueueItem>, volume?: number) => {
     if (queue.length == 0) return;
     let stream = await ytdl(queue[0].match.url);
-    let currentVolume = connection.dispatcher.volume;
 
     connection.play(stream, { type: 'opus' })
         .on('finish', () => {
             queue.shift();
             playQueue(connection, queue, volume);
         }).on('error', error => console.error(error));
-
+        
+    let currentVolume = connection.dispatcher.volume;
     if (!volume) volume = currentVolume;
     connection.dispatcher.setVolume(volume);
     console.log('Now Playing: ', queue[0].match.title)
