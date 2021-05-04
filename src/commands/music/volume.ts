@@ -12,7 +12,7 @@ module.exports = {
         let volume = parseInt(args[0]) / 100;
         if (!volume) return;
         
-        updateVolume(message.guildId, volume);
+        updateVolume(message.guild.id, volume);
         client.voice?.connections.get(message.guild.id)?.dispatcher.setVolume(volume);
     },
 };
