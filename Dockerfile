@@ -7,7 +7,7 @@ COPY --from=0 / /
 
 COPY package*.json ./
 
-RUN apk add --no-cache --virtual .build-deps make gcc g++ build-base automake autoconf libtool cairo-dev \
+RUN apk add --no-cache .build-deps make gcc g++ build-base automake autoconf libtool cairo-dev \
     jpeg-dev \
     pango-dev \ 
     giflib-dev \
