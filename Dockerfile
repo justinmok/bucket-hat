@@ -12,6 +12,7 @@ RUN apk add --no-cache make gcc g++ build-base automake autoconf libtool cairo-d
     pango-dev \ 
     giflib-dev \
     fontconfig \
+    freetype-dev \
     fribidi
 
 RUN npm install canvas
