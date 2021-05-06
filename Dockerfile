@@ -7,7 +7,10 @@ COPY --from=0 / /
 
 COPY package*.json ./
 
-RUN apk add --no-cache --virtual .build-deps make gcc g++ automake autoconf libtool pixman imagemagick cairo giflib-dev build-base cairo-dev cairo-tools pango-dev jpeg-dev zlib-dev freetype-dev lcms2-dev openjpeg-dev tiff-dev tk-dev tcl-dev
+RUN apk add --no-cache --virtual .build-deps make gcc g++ automake autoconf libtool cairo-dev \
+    jpeg-dev \
+    pango-dev \
+    giflib-dev
 RUN npm install --silent
 RUN npm install -g typescript
 RUN apk del .build-deps
