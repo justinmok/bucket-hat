@@ -19,7 +19,6 @@ RUN apk add --no-cache --virtual build-deps \
       pangomm-dev \
       libjpeg-turbo-dev \
       freetype-dev \
-    && npm ci \
     && apk del build-deps \
     && apk add --no-cache \
       cairo \
