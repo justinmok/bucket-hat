@@ -11,7 +11,6 @@ RUN apk add --no-cache --virtual .build-deps make gcc g++ build-base automake au
     jpeg-dev \
     pango-dev \ 
     giflib-dev \
-    python \
     pango
 RUN npm install --silent --build-from-source
 RUN npm install -g typescript node-gyp
