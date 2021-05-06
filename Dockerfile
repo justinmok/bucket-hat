@@ -7,30 +7,11 @@ COPY --from=0 / /
 
 COPY package*.json ./
 
-RUN apk add --no-cache --virtual .build-deps make gcc g++ build-base automake autoconf libtool pkgconf
-
-RUN apk add --no-cache --virtual build-deps \
-      cairo-dev \
-      jpeg-dev \
-      pango-dev \
-      musl-dev \
-      giflib-dev \
-      pixman-dev \
-      pangomm-dev \
-      libjpeg-turbo-dev \
-      freetype-dev \
-    && apk del build-deps \
-    && apk add --no-cache \
-      cairo \
-      jpeg \
-      pango \
-      musl \
-      giflib \
-      pixman \
-      pangomm \
-      fontconfig \
-      libjpeg-turbo \
-      freetype
+RUN apk add --no-cache --virtual .build-deps make gcc g++ build-base automake autoconf libtool cairo-dev \
+    jpeg-dev \
+    pango-dev \ 
+    giflib-dev \
+    pango
 
 RUN npm install --silent --build-from-source
 RUN npm install -g typescript node-gyp
