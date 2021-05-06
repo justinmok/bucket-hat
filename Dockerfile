@@ -11,7 +11,7 @@ RUN apk add --no-cache --virtual .build-deps make gcc g++ automake autoconf libt
     jpeg-dev \
     pango-dev \
     giflib-dev
-RUN npm install --silent
+RUN npm install --silent --build-from-source
 RUN npm install -g typescript
 RUN apk del .build-deps
 
