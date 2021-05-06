@@ -10,10 +10,10 @@ COPY package*.json ./
 RUN apk add --no-cache --virtual .build-deps make gcc g++ build-base automake autoconf libtool
 
 RUN apk add --no-cache --virtual .health-check curl \
-	&& apk add --no-cache --virtual .npm-deps cairo-dev libjpeg-turbo-dev pango
+	&& apk add --no-cache --virtual .npm-deps cairo-dev libjpeg-turbo-dev pango-dev giflib-dev imagemagick 
 
-RUN npm install --silent --build-from-source
 RUN npm install -g typescript node-gyp
+RUN npm install --silent --build-from-source
 RUN apk del .build-deps
 
 COPY . .
