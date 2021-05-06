@@ -9,11 +9,9 @@ COPY package*.json ./
 
 RUN apk add --no-cache --virtual .build-deps make gcc g++ build-base automake autoconf libtool
 
-RUN apk add --no-cache .npm-deps cairo-dev \
-    jpeg-dev \
-    pango-dev \ 
-    giflib-dev \
-    pango
+RUN apk add --no-cache --virtual .health-check curl \
+	&& apk add --no-cache --virtual .npm-deps cairo-dev libjpeg-turbo-dev pango
+
 RUN npm install --silent --build-from-source
 RUN npm install -g typescript node-gyp
 RUN apk del .build-deps
