@@ -14,7 +14,8 @@ RUN apk del .build-deps
 
 COPY . .
 
-RUN sed '8d' node_modules/chartjs-node-canvas/dist/index.d.ts
+# delete problem line
+RUN sed -i '8d' node_modules/chartjs-node-canvas/dist/index.d.ts
 RUN tsc -p ./tsconfig.json
 
 CMD ["npm", "start"]
