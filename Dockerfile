@@ -29,6 +29,7 @@ RUN apk add --no-cache --virtual build-deps \
       giflib \
       pixman \
       pangomm \
+      fontconfig \
       libjpeg-turbo \
       freetype
 
