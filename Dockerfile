@@ -7,7 +7,7 @@ COPY --from=0 / /
 
 COPY package*.json ./
 
-RUN apk add --no-cache --virtual .build-deps make gcc g++ build-base automake autoconf libtool cairo-dev \
+RUN apk add --no-cache make gcc g++ build-base automake autoconf libtool cairo-dev \
     jpeg-dev \
     pango-dev \ 
     giflib-dev \
@@ -16,7 +16,7 @@ RUN apk add --no-cache --virtual .build-deps make gcc g++ build-base automake au
 RUN npm install canvas --build-from-source
 RUN npm install --silent --build-from-source
 RUN npm install -g typescript node-gyp
-RUN apk del .build-deps
+#RUN apk del .build-deps
 
 COPY . .
 
