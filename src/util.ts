@@ -3,7 +3,7 @@ import { request } from 'gaxios';
 
 import * as fs from 'fs';
 
-import type { BotConfig, DiscordCommand, cryptoInfo } from '../typings/index';
+import type { BotConfig, DiscordCommand, geminiResponse, cryptoInfo } from '../typings/index';
 
 type prefixMap = Map<string, string>;
 
@@ -83,17 +83,14 @@ export const getCommands = (): Promise<Map<string, DiscordCommand>> => {
     });
 }
 
-export const queryCrypto = (ticker: string, base: string = 'USD', exchange: string = 'binance'): Promise<cryptoInfo> => {
+export const queryCrypto = (ticker: string, base: string = 'USD'): Promise<cryptoInfo> => {
     return new Promise<cryptoInfo>((resolve, reject) => {
-        console.log(`Sending request to https://sochain.com/api/v2/get_price/${ticker}/${base}`);
         request({
-            url: `https://sochain.com/api/v2/get_price/${ticker}/${base}`
+            url: `https://api.gemini.com/v2/ticker/${ticker}${base}`
         }).then(res => {
             if (res.status != 200) reject('Request failed');
-            let data = res.data as sochainResponse;
-            let prices = data.data.prices;
-            if (data.data.network != ticker) reject(`Invalid ticker: ${ticker}`);
-            for (const price of prices) if (price.price > 0.001) resolve({...price, 'ticker': ticker});
+            let data = res.data as geminiResponse;
+            resolve({...data, exchange: 'Gemini', fiat: base.toUpperCase(), ticker: ticker.toUpperCase()})
         }).catch(e => reject(e));
     });
 };

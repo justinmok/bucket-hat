@@ -42,10 +42,19 @@ interface DiscordCommand {
 
 type BotCommands = Discord.Collection<string, DiscordCommand>;
 
-interface cryptoInfo {
-    price: number,
-    price_base: string,
-    ticker: string,
+interface geminiResponse {
+    symbol: string,
+    open: string,
+    high: string,
+    low: string,
+    close: string,
+    changes: string[],
+    bid: string,
+    ask: string,
+}
+
+interface cryptoInfo extends geminiResponse{
     exchange: string,
-    time: number
+    fiat: string,
+    ticker: string,
 }
