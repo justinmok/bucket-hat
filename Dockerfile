@@ -18,7 +18,7 @@ RUN apk add --no-cache make gcc g++ build-base automake autoconf libtool cairo-d
     fribidi-dev
 
 RUN npm install canvas
-RUN npm install --silent --build-from-source
+RUN npm install --silent
 RUN npm install -g typescript node-gyp
 #RUN apk del .build-deps
 
