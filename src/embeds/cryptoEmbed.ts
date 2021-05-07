@@ -3,7 +3,7 @@ import { ChartJSNodeCanvas,  } from 'chartjs-node-canvas';
 import type { cryptoInfo } from '../../typings/index'
 import { ChartConfiguration } from 'chart.js';
 
-const chartJSNodeCanvas = new ChartJSNodeCanvas({ width: 800, height: 600 }); 
+const chartJSNodeCanvas = new ChartJSNodeCanvas({ width: 400, height: 150 }); 
 const generateGraph = (info: cryptoInfo): Promise<Buffer> => {
     let changes: Map<number, string> = new Map();
     info.changes.forEach((change, i) => {
