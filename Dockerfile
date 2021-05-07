@@ -9,8 +9,6 @@ COPY package*.json ./
 
 ENV LD_PRELOAD="/usr/lib/libfreetype.so /usr/lib/libfribidi.so /usr/lib/libfontconfig.so"
 
-RUN apk add --update --repository http://dl-3.alpinelinux.org/alpine/edge/testing libmount ttf-dejavu ttf-droid ttf-freefont ttf-liberation ttf-ubuntu-font-family
-
 RUN apk add --no-cache make gcc g++ build-base automake autoconf libtool cairo-dev \
     jpeg-dev \
     pango-dev \ 
@@ -22,6 +20,8 @@ RUN apk add --no-cache make gcc g++ build-base automake autoconf libtool cairo-d
 RUN npm install --silent
 RUN npm install -g typescript
 #RUN apk del .build-deps
+
+RUN apk add --update --repository http://dl-3.alpinelinux.org/alpine/edge/testing libmount ttf-dejavu ttf-droid ttf-freefont ttf-liberation
 
 COPY . .
 
