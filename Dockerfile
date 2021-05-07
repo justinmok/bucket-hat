@@ -7,7 +7,7 @@ COPY --from=0 / /
 
 COPY package*.json ./
 
-ENV LD_PRELOAD=/usr/lib/libfreetype.so
+ENV LD_PRELOAD="/usr/lib/libfreetype.so /usr/lib/libfribidi.so"
 
 RUN apk add --no-cache make gcc g++ build-base automake autoconf libtool cairo-dev \
     jpeg-dev \
