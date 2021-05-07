@@ -9,6 +9,7 @@ const generateGraph = (info: cryptoInfo): Promise<Buffer> => {
     info.changes.forEach((change, i) => {
         changes.set(i, change);
     });
+
     let config: ChartConfiguration = {
         type: 'line',
         data: {
@@ -17,6 +18,8 @@ const generateGraph = (info: cryptoInfo): Promise<Buffer> => {
             datasets: [
                 {
                     data: info.changes.map(num => Number(num)).reverse(),
+                    pointRadius: [...new Array(changes.size - 1).fill(0), 4],
+                    pointBackgroundColor: '#ddd',
                     backgroundColor: 'rgba(0,0,0,1)',
                     borderColor: '#ddd'
                 }
@@ -24,9 +27,8 @@ const generateGraph = (info: cryptoInfo): Promise<Buffer> => {
         },
         options: {
             elements: {
-                point: {
-                    radius: 0,
-                    borderWidth: 0
+                line: {
+                    tension: 0.25
                 },
             },
             scales: {
@@ -36,7 +38,8 @@ const generateGraph = (info: cryptoInfo): Promise<Buffer> => {
                     },
                     ticks: {
                         font: {
-                            size: 24
+                            size: 12,
+                            weight: 'bold'
                         },
                         color: '#ddd',
                     },
@@ -48,7 +51,8 @@ const generateGraph = (info: cryptoInfo): Promise<Buffer> => {
                     },
                     ticks: {
                         font: {
-                            size: 24
+                            size: 12,
+                            weight: 'bold'
                         },
                         color: '#ddd',                    
                     }
