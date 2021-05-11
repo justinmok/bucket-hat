@@ -19,7 +19,6 @@ module.exports = {
         const prefixes = client.prefixes;
         const isDefault = !(prefixes.has(guildId));
 
-        console.log(isDefault);
         if (!args.length) {
             const prefix = (isDefault) ? client.defaultPrefix : prefixes.get(guildId);
             message.channel.send(`The ${(isDefault ? 'default' : 'current')} prefix is \`${prefix}\`.\nYou can change it using \`${prefix}prefix [custom_prefix]\``);

@@ -30,6 +30,8 @@ module.exports = {
                 }
                 else message.channel.send(`Added ${info.title} to the queue.`);
             }).catch(err => console.log(err));
+
+            clearTimeout(message.client.channelTimeout);
         });
     },
 };

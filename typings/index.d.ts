@@ -7,6 +7,7 @@ interface BotClient extends Discord.Client {
     musicQueue: MusicQueue,
     prefixes: Discord.Collection<string, string>,
     cloudProjectId?: string,
+    channelTimeout: NodeJS.Timeout| null;
 }
 
 interface BotConfig {

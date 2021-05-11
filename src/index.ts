@@ -59,15 +59,17 @@ client.on('message', message => {
     }
 });
 
-/* Update prefixes every minute 
-cron.schedule('* * * * *', () => {
-    client.prefixes.forEach((guild, prefix) => prefixes[prefix] = guild);
-    fs.writeFileSync('../prefixes.json', JSON.stringify(prefixes, null, 4));
-});
-*/
-
-cron.schedule('0 * * * *', () => {
-
+client.on('voiceStateUpdate', (pre, next) => {
+    if (client.musicQueue.length == 0 &&
+        client.voice?.connections.has(pre.guild.id) &&
+        client.voice.connections.get(pre.guild.id)?.channel.id == pre.channel?.id &&
+        pre.channel?.members.size == 1) {
+            console.log('starting timeout');
+            client.channelTimeout = setTimeout(() => {
+                console.log('timeout set');
+                client.voice!.connections.get(pre.guild.id)?.channel.leave();
+            }, 300000)
+    }
 });
 
 queryConfig().then(config => {
