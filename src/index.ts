@@ -8,7 +8,9 @@ import { queryConfig, queryPrefixes, getCommands} from './util'
 
 import type { BotClient } from '../typings/index';
 
-const client = new Discord.Client() as BotClient;
+const client = new Discord.Client({
+    intents: ['GUILDS', 'GUILD_MESSAGES', 'GUILD_VOICE_STATES', 'GUILD_MESSAGE_REACTIONS', 'GUILD_MEMBERS', 'GUILD_EMOJIS']
+}) as BotClient;
 client.commands = new Map();
 client.prefixes = new Discord.Collection();
 client.musicQueue = [];

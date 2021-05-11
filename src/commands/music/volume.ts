@@ -13,6 +13,6 @@ module.exports = {
         if (!volume) return;
         
         updateVolume(message.guild.id, volume);
-        client.voice?.connections.get(message.guild.id)?.dispatcher.setVolume(volume);
+        client.voice?.connections.get(message.guild.id)?.dispatcher?.setVolume(volume);
     },
 };

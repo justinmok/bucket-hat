@@ -44,9 +44,9 @@ const playQueue = async (connection: VoiceConnection, queue: Array<QueueItem>, v
             playQueue(connection, queue, volume);
         }).on('error', error => console.error(error));
         
-    let currentVolume = connection.dispatcher.volume;
+    let currentVolume = connection.dispatcher!.volume;
     if (!volume) volume = currentVolume;
-    connection.dispatcher.setVolume(volume);
+    connection.dispatcher?.setVolume(volume);
     console.log('Now Playing: ', queue[0].match.title)
 };
 
