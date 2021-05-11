@@ -51,11 +51,11 @@ export const queryPrefixes = (): Promise<prefixMap> => {
     });
 }
 
-export const getVolume = (serverId: number): Promise<number> => {
+export const getVolume = (serverId: string): Promise<number> => {
     return new Promise<number>((resolve, reject) => {
         serverConfigs.doc(serverId.toString()).get().then(config => {
             if (!(config.data())) reject('vol_not_set');
-            resolve(config.data()!.volume);
+            else resolve(config.data()!.volume);
         })
     });
 }

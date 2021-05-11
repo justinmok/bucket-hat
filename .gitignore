@@ -6,6 +6,7 @@ build/*
 
 prefixes.json
 gcloudauth.json
+test.js
 
 # random audio files for testing
 *.ogg

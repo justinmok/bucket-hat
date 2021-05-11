@@ -1,4 +1,4 @@
-import type { Message, VoiceConnection } from "discord.js";
+import type { CommandInteraction, GuildMember, VoiceConnection } from "discord.js";
 import type { Result } from "ytsr";
 import type { BotClient, QueueItem, VideoResult } from '../../../typings/index';
 import { getInfo } from 'ytdl-core';
@@ -34,7 +34,7 @@ const parseUrl = (query: string): Promise<VideoResult> => {
     });
 }
 
-const playQueue = async (connection: VoiceConnection, queue: Array<QueueItem>, volume?: number) => {
+export const playQueue = async (connection: VoiceConnection, queue: Array<QueueItem>, volume?: number) => {
     if (queue.length == 0) return;
     let stream = await ytdl(queue[0].match.url);
 
@@ -50,23 +50,19 @@ const playQueue = async (connection: VoiceConnection, queue: Array<QueueItem>, v
     console.log('Now Playing: ', queue[0].match.title)
 };
 
-const processQuery = (query: string, message: Message): Promise<VideoResult> => {
+export const processQuery = (interaction: CommandInteraction): Promise<VideoResult> => {
     return new Promise<VideoResult>(async (resolve, reject) => {
-        let { musicQueue } = message.client as BotClient;
+        let { musicQueue } = interaction.client as BotClient;
+        let query = interaction.options[0].value as string;
         search(query).then(result => {
             let addToQueue: QueueItem = {
             match: result[0],
             query: query,
-            requester: message.member,
+            requester: interaction.member as GuildMember,
         }
         musicQueue.push(addToQueue);
         resolve(result[0]);
         });
         
     });
-};
-
-module.exports = {
-    playQueue,
-    processQuery
 };

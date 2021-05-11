@@ -3,7 +3,6 @@ todo: permissions based commands
 */
 import * as Discord from 'discord.js'
 import * as fs from 'fs';
-import * as cron from 'node-cron'
 import { queryConfig, queryPrefixes, getCommands} from './util'
 
 import type { BotClient } from '../typings/index';
@@ -20,17 +19,33 @@ queryPrefixes().then(prefixes => {
     for (const [k, v] of prefixes) client.prefixes.set(k,v);
 });
 
-getCommands().then(commands => {
-    client.commands = commands;
-});
-
-client.once('ready', () => {
+client.once('ready', async () => {
     if (client.user)
     console.log(`Succesfully logged into ${client.user.tag}`);
+    
+    let commands = await getCommands();
+    client.commands = commands;
     console.log(`Loaded ${client.commands.size} commands.`);
+    
+    commands.forEach(cmd => {
+        if (cmd.name !== 'play') return;
+        client.application?.commands.create({
+            name: cmd.name,
+            description: cmd.description,
+            options: cmd.options ?? null
+        });
+    });
+});
+
+client.on('interaction', async interaction => {
+    console.log(interaction);
+    if (!interaction.isCommand()) return;
+    const command = interaction.commandName;
+    client.commands.get(command)?.execute(interaction);
 });
 
 client.on('message', message => {
+    console.log(client.application?.commands);
     /* Get the guild ID */
     let messageGuild = message.guild?.id ?? '';
 

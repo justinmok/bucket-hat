@@ -7,7 +7,7 @@ interface BotClient extends Discord.Client {
     musicQueue: MusicQueue,
     prefixes: Discord.Collection<string, string>,
     cloudProjectId?: string,
-    channelTimeout: NodeJS.Timeout| null;
+    channelTimeout: NodeJS.Timeout | null;
 }
 
 interface BotConfig {
@@ -33,11 +33,9 @@ interface embed {
     createEmbed(...args): Discord.MessageEmbed;
 }
 
-interface DiscordCommand {
-    name: string,
+interface DiscordCommand extends Discord.ApplicationCommand {
     category: 'Admin' | 'General' | 'Music' | 'Experimental',
     usage: string,
-    description: string,
     execute(...args): any
 }
 
