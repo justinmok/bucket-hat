@@ -64,9 +64,7 @@ client.on('voiceStateUpdate', (pre, next) => {
         client.voice?.connections.has(pre.guild.id) &&
         client.voice.connections.get(pre.guild.id)?.channel.id == pre.channel?.id &&
         pre.channel?.members.size == 1) {
-            console.log('starting timeout');
             client.channelTimeout = setTimeout(() => {
-                console.log('timeout set');
                 client.voice!.connections.get(pre.guild.id)?.channel.leave();
             }, 300000)
     }
