@@ -1,0 +1,17 @@
+name: Build Docker Image
+on:
+  pull_request:
+    types: [assigned, opened, synchronize, reopened]
+jobs:
+  build:
+    name: Build Docker Image
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out the repo
+        uses: actions/checkout@v2
+      - name: Build Image
+        uses: docker/build-push-action@v2
+        with:
+          tags: justinmok/buckethat:testing
+          push: false
+
