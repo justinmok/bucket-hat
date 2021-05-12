@@ -3,6 +3,7 @@ node_modules/*
 logs/*
 build/*
 .vscode/*
+.eslintrc.json
 
 prefixes.json
 gcloudauth.json
