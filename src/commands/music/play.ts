@@ -1,4 +1,4 @@
-import { CommandInteraction, GuildMember } from "discord.js";
+import type { CommandInteraction, GuildMember } from "discord.js";
 import type { BotClient, VideoResult } from "../../../typings";
 import { getVolume } from "../../util";
 
@@ -8,7 +8,6 @@ module.exports = {
     name: 'play',
     category: 'Music',
     description: 'Plays a youtube video in the vc lol',
-    usage: '[youtube link]',
     options: [{
         type: 'STRING',
         name: 'query',
@@ -27,15 +26,15 @@ module.exports = {
         if (!voice.channel)
             return interaction.reply('Join a voice channel to use this command.');
         
+        interaction.defer();
         voice.channel.join().then((connection) => {
             processQuery(interaction).then(async (info: VideoResult) => {
                 if (!isPlaying) {
-                    console.log(interaction.guildID);
                     let volume = await getVolume(interaction.guild!.id)
                     playQueue(connection, musicQueue, volume);
-                    interaction.reply(`Now playing ${info.title} in ${voice!.channel!.name}`);
+                    interaction.editReply(`Now playing ${info.title} in ${voice!.channel!.name}`);
                 }
-                else interaction.reply(`Added ${info.title} to the queue.`);
+                else interaction.editReply(`Added ${info.title} to the queue.`);
             }).catch(err => console.log(err));
 
             if (client.channelTimeout) clearTimeout(client.channelTimeout);

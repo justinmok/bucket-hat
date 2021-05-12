@@ -1,14 +1,18 @@
-import { Message } from "discord.js";
+import type { CommandInteraction } from "discord.js";
+import type { BotClient } from "../../../typings";
 
 module.exports = {
     name: 'pause',
     category: 'Music',
     description: 'Pauses the music',
-    usage: '',
+    execute(interaction: CommandInteraction) {
+        let client = interaction.client as BotClient;
+        if (client.musicQueue.length) {
+            interaction.reply('⏸️ Paused')
+            client.voice.connections.get(interaction.guild!.id)?.dispatcher?.pause();
+        } else {
+            interaction.reply('There is no music playing.')
+        }
 
-    execute(message: Message, args: string[]) {
-        let client = message.client;
-        if (message.guild && client.voice)
-        client.voice.connections.get(message.guild.id)?.dispatcher?.pause();
     }
 }

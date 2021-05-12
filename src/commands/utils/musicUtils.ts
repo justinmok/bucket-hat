@@ -8,7 +8,8 @@ const ytRegex = /(youtu\.be|youtube\.com)/;
 const ytsr = require('ytsr');
 
 const search = (query: string, resultCount: number = 1): Promise<Array<VideoResult>> => {
-    return new Promise<Array<VideoResult>>(async (resolve, reject)=> {
+    console.log(`Searching for ${query}`);
+    return new Promise<Array<VideoResult>>(async (resolve, reject) => {
         if (query.match(ytRegex)) resolve([await parseUrl(query)]);
         ytsr.getFilters(query).then(async filters => {
             let filter = await filters.get('Type').get('Video');

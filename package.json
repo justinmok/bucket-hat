@@ -32,7 +32,7 @@
     "chart.js": "^3.2.1",
     "chartjs-node-canvas": "^3.1.0",
     "discord-api-types": "^0.18.1",
-    "discord.js": "github:discordjs/discord.js",
+    "discord.js": "github:discordjs/discord.js#f831872125214e39c8866ce1cf7c63159a3dba39",
     "erlpack": "github:discord/erlpack",
     "ffmpeg": "0.0.4",
     "gaxios": "^4.2.0",

@@ -1,18 +1,22 @@
-import { Message } from "discord.js";
+import { CommandInteraction } from "discord.js";
 
 module.exports = {
     name: 'eval',
     category: 'Admin',
-    usage: 'eval [js expression]',
     description: 'Evaluates Javascript expressions',
-    execute(message: Message, args: string[]) {
-        let client = message.client;
+    options: [{
+        type: 'STRING',
+        name: 'expression',
+        description: 'The Javascript expression to run',
+        required: true
+    }],
+    execute(interaction: CommandInteraction) {
         try {
-            let evaled = eval(args.join(' '));
-            evaled = require('util').inspect(evaled);
-            message.channel.send(`\`\`\`js\n${evaled}\`\`\``);
+            let expression = interaction.options[0].value as string;
+            let evaled = require('util').inspect(eval(expression));
+            interaction.reply(`\`\`\`js\n${evaled}\`\`\``);
         } catch (error) {
-            message.channel.send(`An error occured when evaluating expression: \`\`\`\n${error}\`\`\``);
+            interaction.reply(`An error occured when evaluating expression: \`\`\`\n${error}\`\`\``);
         }
     }
 };
