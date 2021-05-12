@@ -1,3 +1,4 @@
+import type { CommandInteraction } from 'discord.js';
 import type { BotClient } from '../../../typings/index';
 const { playQueue } = require('../utils/musicUtils');
 
@@ -8,16 +9,15 @@ queue controls as reactions (remove, up, down, duplicate)
 module.exports = {
     name: 'skip',
     category: 'General',
-    description: 'skips currently playing song',
-    usage: 'skip',
-
-    execute(message) {
-        let client = message.client as BotClient;
+    description: 'Skips the currently playing song.',
+    execute(interaction: CommandInteraction) {
+        let client = interaction.client as BotClient;
         let { musicQueue } = client;
-        let connection = client.voice?.connections.get(message.guild.id);
+        let connection = client.voice?.connections.get(interaction.guild!.id);
         if (!connection || !(connection.dispatcher)) return;
         connection?.dispatcher.end();
         musicQueue.shift();
         playQueue(connection, musicQueue);
+        interaction.reply('Skipped!');
     },
 };

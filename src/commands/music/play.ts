@@ -1,37 +1,43 @@
+import type { CommandInteraction, GuildMember } from "discord.js";
 import type { BotClient, VideoResult } from "../../../typings";
 import { getVolume } from "../../util";
 
-const { playQueue, processQuery } = require('../utils/musicUtils');
+import { playQueue, processQuery } from '../utils/musicUtils'
 
 module.exports = {
     name: 'play',
     category: 'Music',
     description: 'Plays a youtube video in the vc lol',
-    usage: '[youtube link]',
+    options: [{
+        type: 'STRING',
+        name: 'query',
+        description: 'The YouTube link or search query to play',
+        required: true
+    }],
     playQueue,
-    execute(message, args: string[]) {
-        if (!args.length) return;
-        let user = message.member;
+    execute(interaction: CommandInteraction) {
+        if (!interaction.options[0].value) return;
+        let client = interaction.client as BotClient;
+        let user = interaction.member as GuildMember;
         let voice = user!.voice;
-        let { musicQueue } = message.client as BotClient;
+        let { musicQueue } = client;
         let isPlaying = musicQueue.length != 0;
 
         if (!voice.channel)
-            return message.channel.send('Join a voice channel to use this command.');
-
-        let query = args.join(' ');
+            return interaction.reply('Join a voice channel to use this command.');
         
+        interaction.defer();
         voice.channel.join().then((connection) => {
-            processQuery(query, message).then(async (info: VideoResult) => {
+            processQuery(interaction).then(async (info: VideoResult) => {
                 if (!isPlaying) {
-                    let volume = await getVolume(message.guild.id);
+                    let volume = await getVolume(interaction.guild!.id)
                     playQueue(connection, musicQueue, volume);
-                    message.channel.send(`Now playing ${info.title} in ${voice.channel.name}`);
+                    interaction.editReply(`Now playing ${info.title} in ${voice!.channel!.name}`);
                 }
-                else message.channel.send(`Added ${info.title} to the queue.`);
+                else interaction.editReply(`Added ${info.title} to the queue.`);
             }).catch(err => console.log(err));
 
-            clearTimeout(message.client.channelTimeout);
+            if (client.channelTimeout) clearTimeout(client.channelTimeout);
         });
     },
 };

@@ -1,18 +1,22 @@
-import type { Message } from 'discord.js';
-import { BotClient } from '../../../typings';
+import type { CommandInteraction } from 'discord.js';
+import type { BotClient } from '../../../typings';
 
 module.exports = {
     name: 'remove',
     category: 'Music',
     description: 'Removes item in queue position',
-    usage: '[position]',
-
-    execute(message: Message, args: string[]) {
-        let { musicQueue } = message.client as BotClient;
+    options: [{
+        type: 'INTEGER',
+        name: 'item',
+        description: '# in the queue to remove',
+        required: true
+    }],
+    execute(interaction: CommandInteraction) {
+        let { musicQueue } = interaction.client as BotClient;
         if (!musicQueue.length) return;
-        if (args.length == 0) return message.channel.send('Specify an item in the queue to remove.');
-        let queuePos = parseInt(args[0]) - 1;
+        let queuePos = interaction.options[0].value as number;
         if (queuePos > musicQueue.length) return 0;
-        musicQueue.splice(queuePos, 1);
+        let removed = musicQueue.splice(queuePos, 1);
+        interaction.reply(`Removed ${removed[0].match.title} from the queue.`);
     },
 };

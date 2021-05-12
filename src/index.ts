@@ -2,13 +2,12 @@
 todo: permissions based commands
 */
 import * as Discord from 'discord.js'
-import * as fs from 'fs';
-import * as cron from 'node-cron'
 import { queryConfig, queryPrefixes, getCommands} from './util'
-
 import type { BotClient } from '../typings/index';
 
-const client = new Discord.Client() as BotClient;
+const client = new Discord.Client({
+    intents: ['GUILDS', 'GUILD_MESSAGES', 'GUILD_VOICE_STATES', 'GUILD_MESSAGE_REACTIONS', 'GUILD_MEMBERS', 'GUILD_EMOJIS']
+}) as BotClient;
 client.commands = new Map();
 client.prefixes = new Discord.Collection();
 client.musicQueue = [];
@@ -18,44 +17,52 @@ queryPrefixes().then(prefixes => {
     for (const [k, v] of prefixes) client.prefixes.set(k,v);
 });
 
-getCommands().then(commands => {
-    client.commands = commands;
-});
-
-client.once('ready', () => {
+client.once('ready', async () => {
     if (client.user)
     console.log(`Succesfully logged into ${client.user.tag}`);
-    console.log(`Loaded ${client.commands.size} commands.`);
+    
+    let commands = await getCommands();
+    client.commands = commands;
+
+    await client.application?.commands.fetch(undefined, true, true);
+    console.log(`Loaded ${client.application?.commands.cache.size} commands.`);
+    console.log(client.application?.commands.cache);
+    /* commands.forEach(cmd => {
+        client.application?.commands.create({
+            name: cmd.name,
+            description: cmd.description,
+            options: cmd.options ?? null
+        });
+    }); */
+
+    
+});
+
+client.on('interaction', async interaction => {
+    if (!interaction.isCommand() || !interaction.guild) return;
+    const command = interaction.commandName;
+    try {
+        client.commands.get(command)?.execute(interaction);
+    } catch (e) {
+        console.log(e);
+        interaction.webhook.send(`OOPSIE WOOPSIE!! Uwu We make a fucky wucky!! A wittle fucko boingo! The code monkeys <@148521718388883456> at our headquarters are working VEWY HAWD to fix this! There was an error executing \`${command}\`.\nStacktrace: \`\`\`${e.stack}\`\`\``)
+    }
 });
 
 client.on('message', message => {
-    /* Get the guild ID */
-    let messageGuild = message.guild?.id ?? '';
-
-    /* Get the prefix for the guild */
-    const prefix = client.prefixes.get(messageGuild) ?? client.defaultPrefix;
-
-    /* Message checks */
-    if (message.author.id == '432610292342587392' && message.embeds[0] != undefined) message.react('😄');
-    if (message.author.bot || !(messageGuild) || !(message.content.startsWith(prefix))) return;
-    
-    /* Retrieving command info */
-    const args = message.content.slice(prefix.length).trim().split(/ +/);
-    const command = args.shift()?.toLowerCase() ?? '';
-
-    /* Command does not exist */
-    if (!client.commands.has(command)) return;
-
-    /* Execute command */
-    try {
-        client.commands.get(command)?.execute(message, args);
-    } catch (error) {
-        console.log(error);
-
-        /* User feedback, logs error to file */
-        message.channel.send(`OOPSIE WOOPSIE!! Uwu We make a fucky wucky!! A wittle fucko boingo! The code monkeys <@148521718388883456> at our headquarters are working VEWY HAWD to fix this! There was an error executing \`${command}\`.\nStacktrace: \`\`\`${error.stack}\`\`\``).then(() => {
-            fs.writeFileSync(`./logs/${Date.now()}.error.log`, error);
-        });
+    if (message.author.id == '148521718388883456' && message.content.startsWith('refresh')) {
+        console.log('refreshing commands');
+        client.application?.commands.fetch().then(cmds => {
+            cmds.forEach(cmd => client.application?.commands.delete(cmd));
+            client.commands.forEach(cmd => {
+                console.log('adding', cmd.name);
+                client.application?.commands.create({
+                    name: cmd.name,
+                    description: cmd.description,
+                    options: cmd.options ?? null
+                });
+            });
+        })
     }
 });
 

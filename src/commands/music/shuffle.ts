@@ -1,5 +1,5 @@
-import { Message } from "discord.js";
-import { BotClient, MusicQueue } from "../../../typings";
+import type { CommandInteraction } from "discord.js";
+import type { BotClient, MusicQueue } from "../../../typings";
 
 // durstenfeld shuffle
 const shuffle = (queue: MusicQueue): void => {
@@ -12,14 +12,13 @@ const shuffle = (queue: MusicQueue): void => {
 module.exports = {
     name: 'shuffle',
     category: 'Music',
-    description: 'shuffles bot',
-    usage: '',
-    execute(message: Message, args: string[]) {
-        let { musicQueue } = message.client as BotClient;
+    description: 'Shuffles the music queue',
+    execute(interaction: CommandInteraction) {
+        let { musicQueue } = interaction.client as BotClient;
         /* keep first song */
         let temp = musicQueue.shift();
         shuffle(musicQueue);
         if (temp) musicQueue.unshift(temp);
-        message.reply(`Shuffled ${musicQueue.length - 1} songs`);
+        interaction.reply(`Shuffled ${musicQueue.length - 1} songs`);
     }
 };

@@ -1,5 +1,5 @@
-import { Message } from "discord.js";
-import { BotClient } from "../../../typings";
+import type { CommandInteraction } from "discord.js";
+import type { BotClient } from "../../../typings";
 
 const { queueEmbed } = require('../../embeds/types');
 
@@ -11,14 +11,18 @@ module.exports = {
     name: 'queue',
     category: 'Music',
     description: 'Sends a list of commands',
-    usage: '[position]',
-
-    execute(message: Message, args: string[]) {
-        const { musicQueue } = message.client as BotClient;
-        if (!musicQueue.length) return;
-        if (args.length == 0) {
+    options: [{
+        type: 'INTEGER',
+        name: 'position',
+        description: '# in the queue to get information about',
+        required: false
+    }],
+    execute(interaction: CommandInteraction) {
+        const { musicQueue } = interaction.client as BotClient;
+        if (!musicQueue.length) return interaction.reply('There are no items in the music queue.');
+        if (!interaction.options.length) {
             let embed = queueEmbed(musicQueue);
-            message.channel.send(embed);
+            interaction.reply(embed);
         } 
     },
 };

@@ -1,14 +1,13 @@
-import { Message } from "discord.js";
+import type { CommandInteraction } from "discord.js";
+import type { BotClient } from "../../../typings";
 
 module.exports = {
     name: 'resume',
     category: 'Music',
     description: 'Resumes the music',
-    usage: '',
-
-    execute(message: Message, args: string[]) {
-        let client = message.client;
-        if (message.guild && client.voice)
-        client.voice.connections.get(message.guild.id)?.dispatcher?.resume();
+    execute(interaction: CommandInteraction) {
+        let { musicQueue } = interaction.client as BotClient;
+        if (musicQueue.length > 0)
+            interaction.client.voice.connections.get(interaction.guild!.id)?.dispatcher?.resume();
     }
 }

@@ -1,4 +1,4 @@
-import type { Message, VoiceConnection } from "discord.js";
+import type { CommandInteraction, GuildMember, VoiceConnection } from "discord.js";
 import type { Result } from "ytsr";
 import type { BotClient, QueueItem, VideoResult } from '../../../typings/index';
 import { getInfo } from 'ytdl-core';
@@ -8,7 +8,8 @@ const ytRegex = /(youtu\.be|youtube\.com)/;
 const ytsr = require('ytsr');
 
 const search = (query: string, resultCount: number = 1): Promise<Array<VideoResult>> => {
-    return new Promise<Array<VideoResult>>(async (resolve, reject)=> {
+    console.log(`Searching for ${query}`);
+    return new Promise<Array<VideoResult>>(async (resolve, reject) => {
         if (query.match(ytRegex)) resolve([await parseUrl(query)]);
         ytsr.getFilters(query).then(async filters => {
             let filter = await filters.get('Type').get('Video');
@@ -34,7 +35,7 @@ const parseUrl = (query: string): Promise<VideoResult> => {
     });
 }
 
-const playQueue = async (connection: VoiceConnection, queue: Array<QueueItem>, volume?: number) => {
+export const playQueue = async (connection: VoiceConnection, queue: Array<QueueItem>, volume?: number) => {
     if (queue.length == 0) return;
     let stream = await ytdl(queue[0].match.url);
 
@@ -44,29 +45,25 @@ const playQueue = async (connection: VoiceConnection, queue: Array<QueueItem>, v
             playQueue(connection, queue, volume);
         }).on('error', error => console.error(error));
         
-    let currentVolume = connection.dispatcher.volume;
+    let currentVolume = connection.dispatcher!.volume;
     if (!volume) volume = currentVolume;
-    connection.dispatcher.setVolume(volume);
+    connection.dispatcher?.setVolume(volume);
     console.log('Now Playing: ', queue[0].match.title)
 };
 
-const processQuery = (query: string, message: Message): Promise<VideoResult> => {
+export const processQuery = (interaction: CommandInteraction): Promise<VideoResult> => {
     return new Promise<VideoResult>(async (resolve, reject) => {
-        let { musicQueue } = message.client as BotClient;
+        let { musicQueue } = interaction.client as BotClient;
+        let query = interaction.options[0].value as string;
         search(query).then(result => {
             let addToQueue: QueueItem = {
             match: result[0],
             query: query,
-            requester: message.member,
+            requester: interaction.member as GuildMember,
         }
         musicQueue.push(addToQueue);
         resolve(result[0]);
         });
         
     });
-};
-
-module.exports = {
-    playQueue,
-    processQuery
 };

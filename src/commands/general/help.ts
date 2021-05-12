@@ -1,4 +1,4 @@
-import { Message } from "discord.js";
+import type { CommandInteraction } from "discord.js";
 import { BotClient } from "../../../typings";
 
 const { helpAllEmbed, helpEmbed } = require('../../embeds/types.js');
@@ -7,21 +7,24 @@ module.exports = {
     name: 'help',
     category: 'General',
     description: 'Sends a list of commands',
-    usage: '[command name]',
-
-    execute(message: Message, args: string[]) {
-        const { commands } = message.client as BotClient;
-        if (!(args) || !(args.length)) {
+    options: [{
+        type: 'STRING',
+        name: 'command',
+        description: 'The command you want information from',
+        required: false
+    }],
+    execute(interaction: CommandInteraction) {
+        const { commands } = interaction.client as BotClient;
+        if (!interaction.options.length) {
             let embed = helpAllEmbed(commands);
-            message.channel.send(embed);
+            interaction.reply(embed);
         } else {
-            let commandName = args[0];
-            if (!commands.has(commandName) || args.length > 1) {
-                message.channel.send('That command does not exist.');
-                return;
+            let commandName = interaction.options[0].value as string;
+            if (!commands.has(commandName)) {
+                return interaction.reply('That command does not exist.');
             }
             let embed = helpEmbed(commandName, commands.get(commandName));
-            message.channel.send(embed);
+            interaction.reply(embed);
         }
     },
 };
