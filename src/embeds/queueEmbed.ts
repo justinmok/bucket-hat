@@ -4,17 +4,20 @@ import type { QueueItem } from '../../typings/index';
 module.exports = {
     name: 'queueEmbed',
     createEmbed(queue: Array<QueueItem>) {
-        let { url } = queue[0].match.thumbnails[0];
+        let currentSong = queue[0].match;
+        let { url } = currentSong.thumbnails[0];
         let embed = new Discord.MessageEmbed()
             .setColor('#dddddd')
-            .setTitle('Music Queue')
+            .setTitle('Currently playing:')
+            .setDescription(`[**${currentSong.title}**](${currentSong.url}) (${currentSong.duration})\nRequested by ${queue[0].requester?.displayName}`)
+            .setFooter('Bucket Hat Bot', 'https://cdn.discordapp.com/avatars/783886978974220338/9e5abce14cce133de8c6145e556ee725.png?size=32')
             .setTimestamp()
         
-        if (typeof url == 'string') embed.setThumbnail(url);
+        if (url) embed.setThumbnail(url);
         
         queue.map((queueItem: QueueItem, index) => {
             let { match, requester } = queueItem;
-            embed.addField(`#${index+1} ${match.title}`, (!requester) ? '': 'Requested by ' + requester.displayName);
+            if (index != 0) embed.addField(`#${index+1} ${match.title}`, `Requested by ${requester!.displayName} ([Link](${match.url}))`);
         });
         return embed;
     }

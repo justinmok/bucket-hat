@@ -11,6 +11,7 @@ module.exports = {
             .setColor('#dddddd')
             .setTitle('Bot Documentation')
             .setThumbnail(pfpURL)
+            .setFooter('Bucket Hat Bot', 'https://cdn.discordapp.com/avatars/783886978974220338/9e5abce14cce133de8c6145e556ee725.png?size=32')
             .setTimestamp()
 
         let sortedByCategory: Discord.Collection<string, Array<String>> = new Discord.Collection();

@@ -23,7 +23,7 @@ interface VideoResult extends Omit<ytsr.Video, 'bestThumbnail' | 'author' | 'isU
 interface QueueItem {
     match: VideoResult,
     query: string,
-    requester: Discord.GuildMember | null
+    requester: Discord.GuildMember
 }
 
 type MusicQueue = Array<QueueItem>;

@@ -26,7 +26,6 @@ client.once('ready', async () => {
 
     await client.application?.commands.fetch(undefined, true, true);
     console.log(`Loaded ${client.application?.commands.cache.size} commands.`);
-    console.log(client.application?.commands.cache);
     /* commands.forEach(cmd => {
         client.application?.commands.create({
             name: cmd.name,

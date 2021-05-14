@@ -12,7 +12,8 @@ module.exports = {
             .setThumbnail(pfpURL)
             .setTimestamp()
             .addField(`${commandName} command`, `${command.description}`)
-            .addField('Usage', `\`${command.usage}\``);
+            .addField('Usage', `\`${command.usage}\``)
+            .setFooter('Bucket Hat Bot', 'https://cdn.discordapp.com/avatars/783886978974220338/9e5abce14cce133de8c6145e556ee725.png?size=32');
         return embed;
     }
 };
