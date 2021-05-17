@@ -2,16 +2,13 @@ import type * as Discord from 'discord.js';
 import type * as ytsr from "ytsr";
 
 interface BotClient extends Discord.Client {
-    defaultPrefix: string,
     commands: Map<string, DiscordCommand>,
     musicQueue: MusicQueue,
-    prefixes: Discord.Collection<string, string>,
     cloudProjectId?: string,
     channelTimeout: NodeJS.Timeout | null;
 }
 
 interface BotConfig {
-    defaultPrefix: string,
     token: string,
     testToken: string,
 }

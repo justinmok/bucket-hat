@@ -30,24 +30,8 @@ export const queryConfig = (): Promise<BotConfig> => {
             resolve({
                 token: fetchedConfig?.token,
                 testToken: fetchedConfig?.testToken,
-                defaultPrefix: fetchedConfig?.defaultPrefix
             });
         });
-    });
-}
-
-export const queryPrefixes = (): Promise<prefixMap> => {
-    return new Promise<prefixMap>((resolve, reject) => {
-        let map = new Map();
-        serverConfigs.get().then(snapshot => {
-            snapshot.forEach(server => {
-                map.set(server.id, server.data().prefix);
-            })
-            resolve(map);
-        })
-        .catch(e => {
-            throw e;
-        })
     });
 }
 
@@ -58,10 +42,6 @@ export const getVolume = (serverId: string): Promise<number> => {
             else resolve(config.data()!.volume);
         })
     });
-}
-
-export const updatePrefix = (serverId: string, prefix: string) => {
-    serverConfigs.doc(serverId).update({'prefix': prefix}).catch(e => { throw e });
 }
 
 export const updateVolume = (serverId: string, volume: number) => {

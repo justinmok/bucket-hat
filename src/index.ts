@@ -2,20 +2,14 @@
 todo: permissions based commands
 */
 import * as Discord from 'discord.js'
-import { queryConfig, queryPrefixes, getCommands} from './util'
+import { queryConfig, getCommands} from './util'
 import type { BotClient } from '../typings/index';
 
 const client = new Discord.Client({
     intents: ['GUILDS', 'GUILD_MESSAGES', 'GUILD_VOICE_STATES', 'GUILD_MESSAGE_REACTIONS', 'GUILD_MEMBERS', 'GUILD_EMOJIS']
 }) as BotClient;
 client.commands = new Map();
-client.prefixes = new Discord.Collection();
 client.musicQueue = [];
-
-// fetch prefixes
-queryPrefixes().then(prefixes => {
-    for (const [k, v] of prefixes) client.prefixes.set(k,v);
-});
 
 client.once('ready', async () => {
     if (client.user)
@@ -70,7 +64,6 @@ client.on('voiceStateUpdate', (pre, next) => {
 
 queryConfig().then(config => {
     let token = config.token;
-    client.defaultPrefix = config.defaultPrefix;
     if (process.env.NODE_ENV == 'dev') token = config.testToken;
     console.log(`Logging in with token ***********${token.slice(-8)}`);
     client.login(token);
