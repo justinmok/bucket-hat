@@ -24,7 +24,7 @@ module.exports = {
             && !(host[0].match(ValidHostnameRegex)))
             return interaction.reply(`\`${host[0]}\` is not a valid hostname or IP`);
         
-        let statusMessage = await interaction.reply(`Pinging ${host[0]}`);
+        interaction.reply(`Pinging ${host[0]}`);
         pingServer(host[0], port).then(response => {
             return interaction.editReply([response.description.text, response.ping + ' ms', response.version.name].join('\n'));
         }).catch(err => {

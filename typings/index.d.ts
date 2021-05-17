@@ -53,6 +53,7 @@ interface MinecraftResponse {
 }
 
 type BotCommands = Discord.Collection<string, DiscordCommand>;
+
 interface geminiResponse {
     symbol: string,
     open: string,
