@@ -22,19 +22,11 @@ client.once('ready', async () => {
     console.log(`Succesfully logged into ${client.user.tag}`);
     
     let commands = await getCommands();
+    console.log
     client.commands = commands;
 
     await client.application?.commands.fetch(undefined, true, true);
     console.log(`Loaded ${client.application?.commands.cache.size} commands.`);
-    /* commands.forEach(cmd => {
-        client.application?.commands.create({
-            name: cmd.name,
-            description: cmd.description,
-            options: cmd.options ?? null
-        });
-    }); */
-
-    
 });
 
 client.on('interaction', async interaction => {

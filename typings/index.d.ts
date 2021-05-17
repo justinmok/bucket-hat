@@ -35,7 +35,6 @@ interface embed {
 
 interface DiscordCommand extends Discord.ApplicationCommand {
     category: 'Admin' | 'General' | 'Music' | 'Experimental',
-    usage: string,
     execute(...args): any
 }
 
