@@ -16,7 +16,6 @@ client.once('ready', async () => {
     console.log(`Succesfully logged into ${client.user.tag}`);
     
     let commands = await getCommands();
-    console.log
     client.commands = commands;
 
     await client.application?.commands.fetch(undefined, true, true);
