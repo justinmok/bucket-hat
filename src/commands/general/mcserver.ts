@@ -1,6 +1,6 @@
 import { CommandInteraction, MessageAttachment } from "discord.js";
 import { createEmbed } from "../../embeds/minecraftEmbed";
-import { pingServer } from './utils/minecraft';
+import { pingServer } from '../utils/minecraftUtils';
 
 // https://stackoverflow.com/a/106223
 const ValidIpAddressRegex = "^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$";

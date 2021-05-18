@@ -1,5 +1,5 @@
 import * as net from 'net';
-import { MinecraftResponse } from '../../../../typings';
+import { MinecraftResponse } from '../../../typings';
 
 
 // https://github.com/chrisdickinson/varint/blob/323cb66c382744fecd6af378bff145bc59b8af66/encode.js
