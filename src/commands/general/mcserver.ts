@@ -12,7 +12,7 @@ module.exports = {
     description: 'Gets the status of a Minecraft server',
     options: [{
         type: 'STRING',
-        name: 'IP',
+        name: 'hostname',
         description: 'The IP address of the Minecraft server',
         required: true
     }],

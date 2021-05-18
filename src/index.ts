@@ -35,17 +35,19 @@ client.on('interaction', async interaction => {
 
 client.on('message', message => {
     if (message.author.id == '148521718388883456' && message.content.startsWith('refresh')) {
-        console.log('refreshing commands');
-        client.application?.commands.fetch().then(cmds => {
-            cmds.forEach(cmd => client.application?.commands.delete(cmd));
-            client.commands.forEach(cmd => {
-                console.log('adding', cmd.name);
-                client.application?.commands.create({
-                    name: cmd.name,
-                    description: cmd.description,
-                    options: cmd.options ?? null
-                });
-            });
+        console.log('Refresh Called');
+        client.application?.commands.fetch().then(async cmds => {
+            for (const cmd of cmds) await client.application?.commands.delete(cmd[1]);
+            console.log('Refresh - Removed all commands');
+            for (const cmd of client.commands) {
+                console.log(`Refresh - Adding ${cmd[1].name}`);
+                await client.application?.commands.create({
+                    name: cmd[1].name,
+                    description: cmd[1].description,
+                    options: cmd[1].options ?? null
+                })
+            }
+            console.log(`Refresh - inished adding ${client.application?.commands.cache.size} commands.`);
         })
     }
 });
