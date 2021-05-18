@@ -1,4 +1,5 @@
-import { CommandInteraction } from "discord.js";
+import { CommandInteraction, MessageAttachment } from "discord.js";
+import { createEmbed } from "../../embeds/minecraftEmbed";
 import { pingServer } from './utils/minecraft';
 
 // https://stackoverflow.com/a/106223
@@ -11,7 +12,7 @@ module.exports = {
     description: 'Gets the status of a Minecraft server',
     options: [{
         type: 'STRING',
-        name: 'expression',
+        name: 'IP',
         description: 'The IP address of the Minecraft server',
         required: true
     }],
@@ -24,9 +25,10 @@ module.exports = {
             && !(host[0].match(ValidHostnameRegex)))
             return interaction.reply(`\`${host[0]}\` is not a valid hostname or IP`);
         
-        interaction.reply(`Pinging ${host[0]}`);
-        pingServer(host[0], port).then(response => {
-            return interaction.editReply([response.description.text, response.ping + ' ms', response.version.name].join('\n'));
+        interaction.defer();
+        pingServer(host[0], port).then(async response => {
+            let embed = await createEmbed(response);
+            return interaction.editReply(embed);
         }).catch(err => {
             return interaction.editReply(`Response returned\n\`\`\`\n${err}\`\`\``);
         });

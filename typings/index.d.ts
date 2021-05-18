@@ -42,7 +42,7 @@ interface MinecraftResponse {
     players: {
         max: number,
         online: number,
-        sample?: [ name: string, id: string ]
+        sample: [ name: string, id: string ]
     }
     version: {
         name: string,
