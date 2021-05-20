@@ -1,6 +1,6 @@
 import type { CommandInteraction } from 'discord.js';
 import type { BotClient } from '../../../typings/index';
-const { playQueue } = require('../utils/musicUtils');
+import { playQueue } from '../utils/musicUtils';
 
 /* TODO:
 search in queue
@@ -15,9 +15,10 @@ module.exports = {
         let { musicQueue } = client;
         let connection = client.voice?.connections.get(interaction.guild!.id);
         if (!connection || !(connection.dispatcher)) return;
+        let volume = connection.dispatcher.volume;
         connection?.dispatcher.end();
         musicQueue.shift();
-        playQueue(connection, musicQueue);
+        playQueue(connection, musicQueue, volume);
         interaction.reply('Skipped!');
     },
 };
