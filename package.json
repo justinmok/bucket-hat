@@ -38,6 +38,7 @@
     "gaxios": "^4.2.0",
     "node-cron": "^3.0.0",
     "sodium": "^3.0.2",
+    "spotify-url-info": "^2.2.0",
     "typescript": "^4.2.3",
     "ytdl-core": "^4.5.0",
     "ytdl-core-discord": "^1.3.0",
