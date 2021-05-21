@@ -5,8 +5,12 @@
       "target": "ES6",
       "types": ["node"],
       "strictNullChecks": true,
+      "typeRoots": ["./typings"],
+      "paths": {"*": ["./typings/*"]},
+      "skipLibCheck": true,
       "module": "CommonJS",
       "sourceMap": true
     },
-    "include": ["./src/**/*"]
+    "include": ["./src/**/*"],
+    "exclude": [".node_modules/"]
 }
