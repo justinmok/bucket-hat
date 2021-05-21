@@ -28,13 +28,13 @@ module.exports = {
         
         interaction.defer();
         voice.channel.join().then((connection) => {
-            processQuery(interaction).then(async (info: VideoResult) => {
+            processQuery(interaction).then(async (songs: VideoResult[]) => {
                 if (!isPlaying) {
                     let volume = await getVolume(interaction.guild!.id)
                     playQueue(connection, musicQueue, volume);
-                    interaction.editReply(`Now playing ${info.title} in ${voice!.channel!.name}`);
+                    interaction.editReply(`Now playing ${songs[0].title} in ${voice!.channel!.name}`);
                 }
-                else interaction.editReply(`Added ${info.title} to the queue.`);
+                else interaction.editReply(`Added ${(songs.length > 1) ? songs.length + ' items ' : songs[0].title} to the queue.`);
             }).catch(err => console.log(err));
 
             if (client.channelTimeout) clearTimeout(client.channelTimeout);
