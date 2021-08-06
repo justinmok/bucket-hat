@@ -2,7 +2,9 @@ import type { CommandInteraction, GuildMember } from "discord.js";
 import type { BotClient, VideoResult } from "../../../typings";
 import { getVolume } from "../../util";
 
+import { joinVoiceChannel } from '@discordjs/voice'
 import { playQueue, processQuery } from '../utils/musicUtils'
+import type { adapterCreator} from '@discordjs/voice'
 
 module.exports = {
     name: 'play',
@@ -26,7 +28,13 @@ module.exports = {
         if (!voice.channel)
             return interaction.reply('Join a voice channel to use this command.');
         
-        interaction.defer();
+        interaction.deferReply();
+
+        joinVoiceChannel({
+            channelId: voice.channel.id,
+            guildId: user.guild.id,
+            adapterCreator: user.guild.voiceAdapterCreator
+        })
         voice.channel.join().then((connection) => {
             processQuery(interaction).then(async (songs: VideoResult[]) => {
                 if (!isPlaying) {
