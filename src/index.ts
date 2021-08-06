@@ -2,11 +2,12 @@
 todo: permissions based commands
 */
 import * as Discord from 'discord.js'
+import { getVoiceConnection, VoiceConnectionStatus } from '@discordjs/voice';
 import { queryConfig, getCommands} from './util'
 import type { BotClient } from '../typings/index';
 
 const client = new Discord.Client({
-    intents: ['GUILDS', 'GUILD_MESSAGES', 'GUILD_VOICE_STATES', 'GUILD_MESSAGE_REACTIONS', 'GUILD_MEMBERS', 'GUILD_EMOJIS']
+    intents: ['GUILDS', 'GUILD_MESSAGES', 'GUILD_VOICE_STATES', 'GUILD_MESSAGE_REACTIONS', 'GUILD_MEMBERS']
 }) as BotClient;
 client.commands = new Map();
 client.musicQueue = [];
@@ -18,7 +19,7 @@ client.once('ready', async () => {
     let commands = await getCommands();
     client.commands = commands;
 
-    await client.application?.commands.fetch(undefined, true, true);
+    await client.application?.commands.fetch();
     console.log(`Loaded ${client.application?.commands.cache.size} commands.`);
 });
 
@@ -52,14 +53,14 @@ client.on('message', message => {
     }
 });
 
+// AFK Timeout (5 minutes)
 client.on('voiceStateUpdate', (pre, next) => {
-    if (client.musicQueue.length == 0 &&
-        client.voice?.connections.has(pre.guild.id) &&
-        client.voice.connections.get(pre.guild.id)?.channel.id == pre.channel?.id &&
-        pre.channel?.members.size == 1) {
-            client.channelTimeout = setTimeout(() => {
-                client.voice!.connections.get(pre.guild.id)?.channel.leave();
-            }, 300000)
+    let connection = getVoiceConnection(pre.guild.id);
+    if (client.musicQueue.length == 0 && connection) {
+        let channelId = connection?.joinConfig.channelId;
+        if (channelId == pre.channel?.id &&
+            (!(pre.channel?.members.size) || pre.channel.members.size < 2))
+                client.channelTimeout = setTimeout(() => { connection!.destroy() }, 300000);
     }
 });
 

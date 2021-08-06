@@ -25,10 +25,10 @@ module.exports = {
             && !(host[0].match(ValidHostnameRegex)))
             return interaction.reply(`\`${host[0]}\` is not a valid hostname or IP`);
         
-        interaction.defer();
+        interaction.deferReply();
         pingServer(host[0], port).then(async response => {
             let embed = await createEmbed(response);
-            return interaction.editReply(embed);
+            return interaction.editReply({embeds: [embed]});
         }).catch(err => {
             return interaction.editReply(`Response returned\n\`\`\`\n${err}\`\`\``);
         });
