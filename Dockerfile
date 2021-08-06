@@ -1,6 +1,6 @@
 FROM jrottenberg/ffmpeg:3.3-alpine
 
-FROM nikolaik/python-nodejs:python3.7-nodejs14-alpine
+FROM nikolaik/python-nodejs:python3.7-nodejs16-alpine
 
 WORKDIR /usr/src/app
 COPY --from=0 / /

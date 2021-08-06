@@ -1,7 +1,7 @@
 {
   "name": "bucket-hat-bot",
   "version": "1.0.0",
-  "description": "Bucket Hat Bot",
+  "description": "A general purpose Discord Bot",
   "main": "index.js",
   "scripts": {
     "start": "cd build && node index.js",
@@ -10,14 +10,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/cinixyz/bucket-hat.git"
+    "url": "git+https://github.com/justinmok/bucket-hat.git"
   },
   "author": "Justin Mok",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/cinixyz/bucket-hat/issues"
+    "url": "https://github.com/justinmok/bucket-hat/issues"
   },
-  "homepage": "https://github.com/cinixyz/bucket-hat#readme",
+  "homepage": "https://github.com/justinmok/bucket-hat#readme",
   "nodemonConfig": {
     "ignore": [
       "*.json"
@@ -26,13 +26,14 @@
   },
   "dependencies": {
     "@discordjs/opus": "^0.5.3",
+    "@discordjs/voice": "^0.5.5",
     "@google-cloud/firestore": "^4.13.1",
     "@types/node": "^14.17.5",
     "bufferutil": "^4.0.3",
     "chart.js": "^3.4.1",
     "chartjs-node-canvas": "^3.2.0",
     "discord-api-types": "^0.18.1",
-    "discord.js": "github:discordjs/discord.js#f831872125214e39c8866ce1cf7c63159a3dba39",
+    "discord.js": "^13.0.0",
     "erlpack": "github:discord/erlpack",
     "ffmpeg": "0.0.4",
     "gaxios": "^4.3.0",
