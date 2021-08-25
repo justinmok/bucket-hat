@@ -6,4 +6,4 @@ logs/*
 
 .eslintrc.json
 
-!.git 
+!.git/*
