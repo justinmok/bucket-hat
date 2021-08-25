@@ -4,6 +4,7 @@ import { request } from 'gaxios';
 import * as fs from 'fs';
 
 import type { BotConfig, DiscordCommand, geminiResponse, cryptoInfo } from '../typings/index';
+import { GuildChannel } from 'discord.js';
 
 type prefixMap = Map<string, string>;
 
@@ -74,3 +75,9 @@ export const queryCrypto = (ticker: string, base: string = 'USD'): Promise<crypt
         }).catch(e => reject(e));
     });
 };
+
+export const startCount = (channel?: GuildChannel): Promise<String> => {
+    return new Promise<string>((resolve, reject) => {
+
+    });
+}
