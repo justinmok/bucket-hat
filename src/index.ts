@@ -34,7 +34,7 @@ client.on('interaction', async interaction => {
 });
 
 client.on('message', message => {
-    if (message.author.id == '148521718388883456' && message.content.startsWith('refresh')) {
+    if (message.author.id == '359112475066499083' && message.content.startsWith('refresh')) {
         console.log('Refresh Called');
         client.application?.commands.fetch().then(async cmds => {
             for (const cmd of cmds) await client.application?.commands.delete(cmd[1]);
@@ -47,7 +47,7 @@ client.on('message', message => {
                     options: cmd[1].options ?? null
                 })
             }
-            console.log(`Refresh - inished adding ${client.application?.commands.cache.size} commands.`);
+            console.log(`Refresh - Finished adding ${client.application?.commands.cache.size} commands.`);
         })
     }
 });

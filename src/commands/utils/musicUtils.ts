@@ -67,7 +67,7 @@ export const playQueue = async (connection: VoiceConnection, queue: Array<QueueI
     let currentVolume = connection.dispatcher!.volume;
     if (!volume) volume = currentVolume;
     connection.dispatcher?.setVolume(volume);
-    console.log('Now Playing: ', queue[0].match.title)
+    console.log(`Now Playing: ${queue[0].match.title} with volume ${volume * 100}%`)
 };
 
 
