@@ -2,9 +2,8 @@ import type { CommandInteraction, GuildMember } from "discord.js";
 import type { BotClient, VideoResult } from "../../../typings";
 import { getVolume } from "../../util";
 
-import { joinVoiceChannel } from '@discordjs/voice'
+import { getVoiceConnection, joinVoiceChannel } from '@discordjs/voice'
 import { playQueue, processQuery } from '../utils/musicUtils'
-import type { adapterCreator} from '@discordjs/voice'
 
 module.exports = {
     name: 'play',
@@ -18,7 +17,7 @@ module.exports = {
     }],
     playQueue,
     execute(interaction: CommandInteraction) {
-        if (!interaction.options[0].value) return;
+        if (!interaction.options.getString('query')) return;
         let client = interaction.client as BotClient;
         let user = interaction.member as GuildMember;
         let voice = user!.voice;
@@ -35,17 +34,20 @@ module.exports = {
             guildId: user.guild.id,
             adapterCreator: user.guild.voiceAdapterCreator
         })
-        voice.channel.join().then((connection) => {
-            processQuery(interaction).then(async (songs: VideoResult[]) => {
-                if (!isPlaying) {
-                    let volume = await getVolume(interaction.guild!.id)
-                    playQueue(connection, musicQueue, volume);
-                    interaction.editReply(`Now playing ${songs[0].title} in ${voice!.channel!.name}`);
-                }
-                else interaction.editReply(`Added ${(songs.length > 1) ? songs.length + ' items ' : songs[0].title} to the queue.`);
-            }).catch(err => console.log(err));
 
-            if (client.channelTimeout) clearTimeout(client.channelTimeout);
-        });
+        let connection = getVoiceConnection(interaction.guildId!);
+        if (!connection) interaction.reply('Could not join channel.')
+    
+        processQuery(interaction).then(async (songs: VideoResult[]) => {
+            if (!isPlaying) {
+                let volume = await getVolume(interaction.guild!.id)
+                playQueue(connection!, musicQueue, volume)
+                    .then(player => client.audioPlayers.set(interaction.guildId!, player));
+                interaction.editReply(`Now playing ${songs[0].title} in ${voice!.channel!.name}`);
+            }
+            else interaction.editReply(`Added ${(songs.length > 1) ? songs.length + ' items ' : songs[0].title} to the queue.`);
+        }).catch(err => console.log(err));
+
+        if (client.channelTimeout) clearTimeout(client.channelTimeout);
     },
 };

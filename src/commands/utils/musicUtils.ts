@@ -1,9 +1,11 @@
-import type { CommandInteraction, GuildMember, VoiceConnection } from "discord.js";
+import type { CommandInteraction, GuildMember } from "discord.js";
+import { VoiceConnection, createAudioPlayer, NoSubscriberBehavior, createAudioResource, demuxProbe, AudioPlayerStatus, AudioPlayer } from "@discordjs/voice"
 import type { Result } from "ytsr";
 import type { BotClient, QueueItem, VideoResult } from '../../../typings/index';
 import { getTracks } from 'spotify-url-info';
 import { getInfo } from 'ytdl-core';
 import * as ytsr from 'ytsr';
+import { Readable, Stream } from "stream";
 
 const ytdl = require('ytdl-core-discord');
 const ytRegex = /(youtu\.be|youtube\.com)/;
@@ -16,7 +18,7 @@ const search = (query: string, resultCount: number = 1): Promise<VideoResult[]> 
         ytsr.getFilters(query).then(async filters => {
             let filter = await filters.get('Type')?.get('Video');
             if (filter && filter.url) {
-                let results: Result = await ytsr(filter.url, {limit: resultCount});
+                let results: Result = await ytsr(filter.url, { limit: resultCount });
                 resolve(<VideoResult[]>results.items);
             } else {
                 reject(`Search failed.`)
@@ -54,27 +56,44 @@ const parseUrl = (query: string): Promise<VideoResult> => {
     });
 }
 
-export const playQueue = async (connection: VoiceConnection, queue: Array<QueueItem>, volume?: number) => {
-    if (queue.length == 0) return;
-    let stream = await ytdl(queue[0].match.url);
+export const playQueue = async (connection: VoiceConnection, queue: Array<QueueItem>, volume?: number): Promise<AudioPlayer> => {
+    return new Promise<AudioPlayer>(async (resolve, reject) => {
+        if (queue.length == 0) return;
+        let stream: Readable = await ytdl(queue[0].match.url);
 
-    connection.play(stream, { type: 'opus' })
-        .on('finish', () => {
+        const player = createAudioPlayer({
+            behaviors: {
+                noSubscriber: NoSubscriberBehavior.Pause,
+            },
+        });
+
+        //let readable = await demuxProbe(stream)
+        player.play(createAudioResource(stream));
+        resolve(player);
+
+        const subscription = connection.subscribe(player);
+
+        player.on(AudioPlayerStatus.Idle, () => {
             queue.shift();
+            subscription?.unsubscribe();
             playQueue(connection, queue, volume);
-        }).on('error', error => console.error(error));
-        
-    let currentVolume = connection.dispatcher!.volume;
-    if (!volume) volume = currentVolume;
-    connection.dispatcher?.setVolume(volume);
-    console.log('Now Playing: ', queue[0].match.title)
+        }).on('error', err => reject(err));
+
+        /* todo: finish this
+        let currentVolume = connection.dispatcher!.volume;
+        if (!volume) volume = currentVolume;
+        connection.dispatcher?.setVolume(volume);
+        */
+        console.log('Now Playing: ', queue[0].match.title)
+    });
+
 };
 
 
 export const processQuery = (interaction: CommandInteraction): Promise<VideoResult[]> => {
     return new Promise<VideoResult[]>(async (resolve, reject) => {
         let { musicQueue } = interaction.client as BotClient;
-        let query = interaction.options[0].value as string;
+        let query = interaction.options.getString('query')!;
         if (query.match(spotifyRegex)) {
             getSongsFromSpotify(query).then(results => {
                 musicQueue.push(...results.map(res => {
@@ -85,17 +104,16 @@ export const processQuery = (interaction: CommandInteraction): Promise<VideoResu
                     }
                 }));
                 resolve(results);
-                
             })
         } else {
             search(query).then(result => {
                 let addToQueue: QueueItem = {
-                match: result[0],
-                query: query,
-                requester: interaction.member as GuildMember,
-            }
-            musicQueue.push(addToQueue);
-            resolve([result[0]]);
+                    match: result[0],
+                    query: query,
+                    requester: interaction.member as GuildMember,
+                }
+                musicQueue.push(addToQueue);
+                resolve([result[0]]);
             });
         }
     });

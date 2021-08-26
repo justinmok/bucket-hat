@@ -13,6 +13,8 @@ module.exports = {
         required: true
     }],
     execute(interaction: CommandInteraction) {
+        return interaction.reply('WIP');
+        /*
         let client = interaction.client as BotClient;
         let guild = interaction.guild!.id!;
         let volume = interaction.options[0].value as number / 100;
@@ -22,5 +24,6 @@ module.exports = {
             client.voice?.connections.get(guild)?.dispatcher?.setVolume(volume);
 
         interaction.reply(`Set the volume to ${volume * 100}%`);
+        */
     },
 };

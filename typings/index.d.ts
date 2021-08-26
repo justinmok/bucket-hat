@@ -1,8 +1,10 @@
+import type { AudioPlayer } from '@discordjs/voice';
 import type * as Discord from 'discord.js';
 import type * as ytsr from "ytsr";
 
 interface BotClient extends Discord.Client {
     commands: Map<string, DiscordCommand>,
+    audioPlayers: Map<string, AudioPlayer>
     musicQueue: MusicQueue,
     cloudProjectId?: string,
     channelTimeout: NodeJS.Timeout | null;

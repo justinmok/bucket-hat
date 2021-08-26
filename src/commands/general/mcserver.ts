@@ -1,5 +1,5 @@
 import { CommandInteraction, MessageAttachment } from "discord.js";
-import { createEmbed } from "../../embeds/minecraftEmbed";
+import { createEmbed, getAttachment } from "../../embeds/minecraftEmbed";
 import { pingServer } from '../utils/minecraftUtils';
 
 // https://stackoverflow.com/a/106223
@@ -28,7 +28,8 @@ module.exports = {
         interaction.deferReply();
         pingServer(host[0], port).then(async response => {
             let embed = await createEmbed(response);
-            return interaction.editReply({embeds: [embed]});
+            let attachment = await getAttachment(response.favicon!);
+            return interaction.editReply({embeds: [embed], files: [attachment]});
         }).catch(err => {
             return interaction.editReply(`Response returned\n\`\`\`\n${err}\`\`\``);
         });

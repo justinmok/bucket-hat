@@ -65,6 +65,7 @@ const generateGraph = (info: cryptoInfo): Promise<Buffer> => {
         }
     }
     return new Promise<Buffer>((resolve, reject) => {
+        // @ts-expect-error
         let attachment = chartJSNodeCanvas.renderToBufferSync(config, 'image/png');
         resolve(attachment);
     });

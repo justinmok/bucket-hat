@@ -1,24 +1,27 @@
+import { getVoiceConnection } from '@discordjs/voice';
 import type { CommandInteraction } from 'discord.js';
 import type { BotClient } from '../../../typings/index';
 import { playQueue } from '../utils/musicUtils';
 
 /* TODO:
-search in queue
-queue controls as reactions (remove, up, down, duplicate)
+volume adjustments
 */
 module.exports = {
     name: 'skip',
     category: 'General',
     description: 'Skips the currently playing song.',
     execute(interaction: CommandInteraction) {
-        let client = interaction.client as BotClient;
-        let { musicQueue } = client;
-        let connection = client.voice?.connections.get(interaction.guild!.id);
-        if (!connection || !(connection.dispatcher)) return;
-        let volume = connection.dispatcher.volume;
-        connection?.dispatcher.end();
+        let { musicQueue, audioPlayers } = interaction.client as BotClient;
+        let connection = getVoiceConnection(interaction.guildId!);
+
+        if (musicQueue.length == 0) return interaction.reply('There is nothing to be skipped.');
+
+        audioPlayers.get(interaction.guildId!)?.stop()
         musicQueue.shift();
-        playQueue(connection, musicQueue, volume);
+
+        if (connection) playQueue(connection, musicQueue);
+        else return interaction.reply('There is no active voice connection.')
+
         interaction.reply('Skipped!');
     },
 };

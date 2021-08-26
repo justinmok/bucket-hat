@@ -17,8 +17,15 @@ export const createEmbed = (response: MinecraftResponse): Promise<MessageEmbed> 
         else {
             let imageBuffer = Buffer.from(response.favicon!, 'base64');
             let attachment = new MessageAttachment(Buffer.from(imageBuffer), 'favicon.png');
-            embed.attachFiles([attachment]);
             resolve(embed.setThumbnail('attachment://favicon.png'));
         }
+    });
+}
+
+export const getAttachment = (favicon: string): Promise<MessageAttachment> => {
+    return new Promise<MessageAttachment>((resolve, reject) => { 
+        let imageBuffer = Buffer.from(favicon, 'base64');
+        let attachment = new MessageAttachment(Buffer.from(imageBuffer), 'favicon.png');
+        resolve(attachment);
     });
 }
