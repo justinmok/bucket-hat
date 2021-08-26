@@ -14,7 +14,7 @@ module.exports = {
     execute(interaction: CommandInteraction) {
         const { musicQueue } = interaction.client as BotClient;
         if (!musicQueue.length) return interaction.reply('There are no items in the music queue.');
-        if (!interaction.options.length) {
+        if (!interaction.options.getInteger('items')) {
             musicQueue.splice(1)
             interaction.reply('Cleared the queue');
         }
