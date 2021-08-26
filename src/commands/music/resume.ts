@@ -1,3 +1,4 @@
+import { getVoiceConnection } from "@discordjs/voice";
 import type { CommandInteraction } from "discord.js";
 import type { BotClient } from "../../../typings";
 
@@ -6,8 +7,9 @@ module.exports = {
     category: 'Music',
     description: 'Resumes the music',
     execute(interaction: CommandInteraction) {
-        let { musicQueue } = interaction.client as BotClient;
-        if (musicQueue.length > 0)
-            interaction.client.voice.connections.get(interaction.guild!.id)?.dispatcher?.resume();
+        let { musicQueue, audioPlayers } = interaction.client as BotClient;
+        if (musicQueue.length == 0) return interaction.reply('There is nothing to be resumed!');
+
+        audioPlayers.get(interaction.guildId!)?.unpause();
     }
 }

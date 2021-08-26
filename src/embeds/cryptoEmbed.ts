@@ -1,7 +1,6 @@
 import * as Discord from 'discord.js';
 import { ChartJSNodeCanvas,  } from 'chartjs-node-canvas';
 import type { cryptoInfo } from '../../typings/index'
-import { ChartConfiguration } from 'chart.js';
 
 const chartJSNodeCanvas = new ChartJSNodeCanvas({ width: 400, height: 150 }); 
 const generateGraph = (info: cryptoInfo): Promise<Buffer> => {
@@ -10,7 +9,7 @@ const generateGraph = (info: cryptoInfo): Promise<Buffer> => {
         changes.set(i, change);
     });
 
-    let config: ChartConfiguration = {
+    let config = {
         type: 'line',
         data: {
             labels: Array.from({length: 24}, (_, i) => i + 1).reverse(),
@@ -66,6 +65,7 @@ const generateGraph = (info: cryptoInfo): Promise<Buffer> => {
         }
     }
     return new Promise<Buffer>((resolve, reject) => {
+        // @ts-expect-error
         let attachment = chartJSNodeCanvas.renderToBufferSync(config, 'image/png');
         resolve(attachment);
     });
@@ -84,6 +84,7 @@ module.exports = {
             .setTitle(`1 ${info.ticker} = ${info.bid} ${info.fiat}`)
             .setThumbnail(`https://github.com/spothq/cryptocurrency-icons/raw/master/128/white/${info.ticker.toLowerCase()}.png`)
             .setTimestamp()
+            .setImage('attachment://graph.png')
             .setDescription(`Last reported price on [${info.exchange}](https://www.gemini.com)`)
             .addField('🕛 24 Hour Change', `${(rise) ? '🟢 Up ' : '🔴 Down'} $${change.toFixed(2)} (${percentChange.toFixed(2)}%)`)
             .setFooter('Bucket Hat Bot', 'https://cdn.discordapp.com/avatars/783886978974220338/9e5abce14cce133de8c6145e556ee725.png?size=32')
@@ -91,9 +92,7 @@ module.exports = {
         
         return new Promise((resolve, reject) => {
             generateGraph(info).then(graph => {
-                let attachment = new Discord.MessageAttachment(graph, 'graph.png');
-                embed.attachFiles([attachment])
-                resolve(embed.setImage('attachment://graph.png'));
+                resolve({ embeds: [embed], files: [graph]})
             });
         });
 
