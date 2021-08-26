@@ -67,8 +67,12 @@ export const playQueue = async (connection: VoiceConnection, queue: Array<QueueI
             },
         });
 
-        //let readable = await demuxProbe(stream)
-        player.play(createAudioResource(stream));
+        let resource = createAudioResource(stream, { inlineVolume: true });
+        let currentVolume = resource.volume!.volume;
+        if (!volume) volume = currentVolume;
+        resource.volume!.setVolume(volume);
+
+        player.play(resource);
         resolve(player);
 
         const subscription = connection.subscribe(player);
