@@ -1,12 +1,11 @@
-import * as Discord from 'discord.js';
+import { MessageEmbed } from 'discord.js'
 import type { QueueItem } from '../../typings/index';
 
-module.exports = {
-    name: 'queueEmbed',
-    createEmbed(queue: Array<QueueItem>) {
+export const createEmbed = (queue: Array<QueueItem>): Promise<MessageEmbed> => {
+    return new Promise<MessageEmbed>((resolve, reject) => {
         let currentSong = queue[0].match;
         let { url } = currentSong.thumbnails[0];
-        let embed = new Discord.MessageEmbed()
+        let embed = new MessageEmbed()
             .setColor('#dddddd')
             .setTitle('Currently playing:')
             .setDescription(`[**${currentSong.title}**](${currentSong.url}) (${currentSong.duration})\nRequested by ${queue[0].requester?.displayName}`)
@@ -19,6 +18,6 @@ module.exports = {
             let { match, requester } = queueItem;
             if (index != 0) embed.addField(`#${index+1} ${match.title}`, `Requested by ${requester!.displayName} ([Link](${match.url}))`);
         });
-        return embed;
-    }
+        resolve(embed);
+    });
 };

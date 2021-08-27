@@ -1,7 +1,6 @@
 import type { CommandInteraction } from "discord.js";
 import type { BotClient } from "../../../typings";
-
-const { queueEmbed } = require('../../embeds/types');
+import { createEmbed } from '../../embeds/queueEmbed';
 
 /* TODO:
 search in queue
@@ -17,12 +16,12 @@ module.exports = {
         description: '# in the queue to get information about',
         required: false
     }],
-    execute(interaction: CommandInteraction) {
+    async execute(interaction: CommandInteraction) {
         const { musicQueue } = interaction.client as BotClient;
         if (!musicQueue.length) return interaction.reply('There are no items in the music queue.');
         if (!interaction.options.data.length) {
-            let embed = queueEmbed(musicQueue);
-            interaction.reply(embed);
+            let embed = await createEmbed(musicQueue);
+            interaction.reply({ embeds: [embed]});
         } 
     },
 };
