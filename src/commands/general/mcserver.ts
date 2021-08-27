@@ -17,7 +17,7 @@ module.exports = {
         required: true
     }],
     async execute(interaction: CommandInteraction) {
-        let hostString = interaction.options[0].value! as string
+        let hostString = interaction.options.getString('hostname')!;
         let host = hostString.split(':');
         let port = parseInt(host[1]) || 25565;
 

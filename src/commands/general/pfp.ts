@@ -11,7 +11,7 @@ module.exports = {
         required: true
     }],
     execute(interaction: CommandInteraction) {
-        let user = interaction.options[0].user!;
+        let user = interaction.options.getUser('user')!;
         if (!user.avatar) interaction.reply('The user provided either has a default avatar or the bot is broken.');
         else interaction.reply(`https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png?size=512`);
     }

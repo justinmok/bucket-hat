@@ -12,7 +12,7 @@ module.exports = {
     }],
     execute(interaction: CommandInteraction) {
         try {
-            let expression = interaction.options[0].value as string;
+            let expression = interaction.options.getString('expression')!;
             let evaled = require('util').inspect(eval(expression));
             interaction.reply(`\`\`\`js\n${evaled}\`\`\``);
         } catch (error) {

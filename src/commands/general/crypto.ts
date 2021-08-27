@@ -21,8 +21,8 @@ module.exports = {
     }
     ],
     execute(interaction: CommandInteraction) {
-        let ticker = interaction.options[0].value as string;
-        let currency = (interaction.options[1]) ? interaction.options[1].value as string: undefined;
+        let ticker = interaction.options.getString('ticker')!;
+        let currency = interaction.options.getString('currency') ?? undefined;
 
         queryCrypto(ticker, currency).then(async res => {
             let embed = await cryptoEmbed(res);
