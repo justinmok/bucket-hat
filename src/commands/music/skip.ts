@@ -16,7 +16,7 @@ module.exports = {
 
         if (musicQueue.length == 0) return interaction.reply('There is nothing to be skipped.');
 
-        audioPlayers.get(interaction.guildId!)?.stop()
+        audioPlayers.get(interaction.guildId!)!.player!.stop()
         musicQueue.shift();
 
         if (connection) playQueue(connection, musicQueue);

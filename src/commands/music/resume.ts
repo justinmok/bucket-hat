@@ -10,6 +10,6 @@ module.exports = {
         let { musicQueue, audioPlayers } = interaction.client as BotClient;
         if (musicQueue.length == 0) return interaction.reply('There is nothing to be resumed!');
 
-        audioPlayers.get(interaction.guildId!)?.unpause();
+        audioPlayers.get(interaction.guildId!)!.player!.unpause();
     }
 }

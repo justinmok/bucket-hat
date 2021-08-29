@@ -6,7 +6,7 @@ module.exports = {
     category: 'Music',
     description: 'Pauses the music',
     execute(interaction: CommandInteraction) {
-        let { audioPlayers } = interaction.client as BotClient;
-        audioPlayers.get(interaction.guildId!)?.pause();
+        let { musicQueue, audioPlayers } = interaction.client as BotClient;
+        if (musicQueue.length) audioPlayers.get(interaction.guildId!)!.player.pause();
     }
 }
