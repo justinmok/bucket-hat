@@ -60,8 +60,12 @@ const parseUrl = (query: string): Promise<VideoResult> => {
 export const playQueue = async (connection: VoiceConnection, queue: Array<QueueItem>, volume?: number): Promise<AudioPlayerWithResource> => {
     return new Promise<AudioPlayerWithResource>(async (resolve, reject) => {
         if (queue.length == 0) return;
-        let stream: Readable = await ytdl(queue[0].match.url);
+        let stream: Readable = await ytdl(queue[0].match.url, { highWaterMark: 1 << 32 });
 
+        stream.on('unpipe', (e) => {
+            reject(`ytdl error: unpiped\n ${e}`)
+        })
+        
         const player = createAudioPlayer({
             behaviors: {
                 noSubscriber: NoSubscriberBehavior.Pause,
