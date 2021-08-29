@@ -16,12 +16,12 @@ module.exports = {
 
         if (musicQueue.length == 0) return interaction.reply('There is nothing to be skipped.');
 
-        audioPlayers.get(interaction.guildId!)!.player!.stop()
+        console.log(`Skipping: ${musicQueue[0].match.title}. 
+            ${(musicQueue[1]) ? 'Next song: ' + musicQueue[1].match.title : ''}`)
+        audioPlayers.get(interaction.guildId!)!.player!.stop(true)
         musicQueue.shift();
 
         if (connection) playQueue(connection, musicQueue);
-        else return interaction.reply('There is no active voice connection.')
-
         interaction.reply('Skipped!');
     },
 };
