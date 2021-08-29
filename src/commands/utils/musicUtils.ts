@@ -1,7 +1,7 @@
 import type { CommandInteraction, GuildMember } from "discord.js";
-import { VoiceConnection, createAudioPlayer, NoSubscriberBehavior, createAudioResource, demuxProbe, AudioPlayerStatus, AudioPlayer } from "@discordjs/voice"
+import { VoiceConnection, createAudioPlayer, NoSubscriberBehavior, createAudioResource, demuxProbe, AudioPlayerStatus, AudioPlayer, AudioResource } from "@discordjs/voice"
 import type { Result } from "ytsr";
-import type { BotClient, QueueItem, VideoResult } from '../../../typings/index';
+import type { AudioPlayerWithResource, BotClient, QueueItem, VideoResult } from '../../../typings/index';
 import { getTracks } from 'spotify-url-info';
 import { getInfo } from 'ytdl-core';
 import * as ytsr from 'ytsr';
@@ -10,6 +10,7 @@ import { Readable, Stream } from "stream";
 const ytdl = require('ytdl-core-discord');
 const ytRegex = /(youtu\.be|youtube\.com)/;
 const spotifyRegex = /(:|\/)([A-z0-9]{22})/;
+
 
 const search = (query: string, resultCount: number = 1): Promise<VideoResult[]> => {
     console.log(`Searching for ${query}`);
@@ -56,8 +57,8 @@ const parseUrl = (query: string): Promise<VideoResult> => {
     });
 }
 
-export const playQueue = async (connection: VoiceConnection, queue: Array<QueueItem>, volume?: number): Promise<AudioPlayer> => {
-    return new Promise<AudioPlayer>(async (resolve, reject) => {
+export const playQueue = async (connection: VoiceConnection, queue: Array<QueueItem>, volume?: number): Promise<AudioPlayerWithResource> => {
+    return new Promise<AudioPlayerWithResource>(async (resolve, reject) => {
         if (queue.length == 0) return;
         let stream: Readable = await ytdl(queue[0].match.url);
 
@@ -73,7 +74,7 @@ export const playQueue = async (connection: VoiceConnection, queue: Array<QueueI
         resource.volume!.setVolume(volume);
 
         player.play(resource);
-        resolve(player);
+        resolve({player, resource});
 
         const subscription = connection.subscribe(player);
 

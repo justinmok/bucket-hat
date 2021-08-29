@@ -18,7 +18,7 @@ module.exports = {
         let volume = interaction.options.getInteger('percent')! / 100;
         
         updateVolume(guild, volume);
-        // todo: update volume in realtime
-        interaction.reply(`Set the volume to ${volume * 100}%. Changes will take effect on the next song.`);
+        if (musicQueue.length) audioPlayers.get(interaction.guildId!)!.resource.volume!.setVolume(volume);
+        interaction.reply(`Set the volume to ${volume * 100}%.`);
     },
 };
