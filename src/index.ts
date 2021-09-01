@@ -15,6 +15,7 @@ const client = new Discord.Client({
 client.commands = new Map();
 client.musicQueue = [];
 client.audioPlayers = new Map();
+client.countingGames = new Map();
 
 client.once('ready', async () => {
     if (client.user)
