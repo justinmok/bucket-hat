@@ -38,6 +38,7 @@ module.exports = {
         let connection = getVoiceConnection(interaction.guildId!);
         if (!connection) interaction.reply('Could not join channel.')
     
+        interaction.reply('Searching...')
         processQuery(interaction).then(async (songs: VideoResult[]) => {
             if (!isPlaying) {
                 let volume = await getVolume(interaction.guild!.id)
