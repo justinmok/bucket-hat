@@ -14,7 +14,7 @@ const rest = new REST({ version: '9'});
 const client = new Discord.Client({
     intents: ['GUILDS', 'GUILD_MESSAGES', 'GUILD_VOICE_STATES', 'GUILD_MESSAGE_REACTIONS', 'GUILD_MEMBERS']
 }) as BotClient;
-const CLIENT_ID = '464186918457049088';
+const TEST_CLIENT_ID = '464186918457049088';
 
 client.commands = new Map();
 client.musicQueue = [];
@@ -35,10 +35,10 @@ client.once('ready', async () => {
 
     if (process.env.NODE_ENV == 'dev') {
         /* debugging guilds */
-        await rest.put(Routes.applicationGuildCommands(CLIENT_ID, '378778569465266197'), { body: data });
-        await rest.put(Routes.applicationGuildCommands(CLIENT_ID, '676293029879087104'), { body: data });
+        await rest.put(Routes.applicationGuildCommands(TEST_CLIENT_ID, '378778569465266197'), { body: data });
+        await rest.put(Routes.applicationGuildCommands(TEST_CLIENT_ID, '676293029879087104'), { body: data });
     } else {
-        await rest.put(Routes.applicationCommands(CLIENT_ID), { body: data });
+        await rest.put(Routes.applicationCommands('783886978974220338'), { body: data });
     }
     await client.application?.commands.fetch();
     console.log(`Loaded ${client.application?.commands.cache.size} commands.`);
