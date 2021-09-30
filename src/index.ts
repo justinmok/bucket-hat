@@ -3,15 +3,18 @@ todo: permissions based commands
 */
 import * as Discord from 'discord.js'
 import { REST } from '@discordjs/rest';
+import { Routes} from 'discord-api-types/v9'
 
 import { getVoiceConnection } from '@discordjs/voice';
 import { queryConfig, getCommands} from './util'
-import type { BotClient } from '../typings/index';
+import type { BotClient, SlashCommandDataJSON } from '../typings/index';
 
 const rest = new REST({ version: '9'});
 const client = new Discord.Client({
     intents: ['GUILDS', 'GUILD_MESSAGES', 'GUILD_VOICE_STATES', 'GUILD_MESSAGE_REACTIONS', 'GUILD_MEMBERS']
 }) as BotClient;
+const CLIENT_ID = '464186918457049088';
+
 client.commands = new Map();
 client.musicQueue = [];
 client.audioPlayers = new Map();
@@ -23,11 +26,24 @@ client.once('ready', async () => {
     let commands = await getCommands();
     client.commands = commands;
 
+    let data: SlashCommandDataJSON[] = [];
+    for (let [k,v] of commands) {            
+        console.log(`Pushing ${k} to commands`);
+        data.push(v.data.toJSON())
+    }
+
+    if (process.env.NODE_ENV == 'dev') {
+        /* debugging guilds */
+        await rest.put(Routes.applicationGuildCommands(CLIENT_ID, '378778569465266197'), { body: data });
+        await rest.put(Routes.applicationGuildCommands(CLIENT_ID, '676293029879087104'), { body: data });
+    } else {
+        await rest.put(Routes.applicationCommands(CLIENT_ID), { body: data });
+    }
     await client.application?.commands.fetch();
     console.log(`Loaded ${client.application?.commands.cache.size} commands.`);
 });
 
-client.on('interaction', async interaction => {
+client.on('interactionCreate', async interaction => {
     if (!interaction.isCommand() || !interaction.guild) return;
     const command = interaction.commandName;
     try {
@@ -44,15 +60,6 @@ client.on('messageCreate', message => {
         client.application?.commands.fetch().then(async cmds => {
             for (const cmd of cmds) await client.application?.commands.delete(cmd[1]);
             console.log('Refresh - Removed all commands');
-            for (const cmd of client.commands) {
-                console.log(`Refresh - Adding ${cmd[1].name}`);
-                await client.application?.commands.create({
-                    name: cmd[1].name,
-                    description: cmd[1].description,
-                    options: cmd[1].options ?? null
-                })
-            }
-            console.log(`Refresh - Finished adding ${client.application?.commands.cache.size} commands.`);
         })
     }
 });

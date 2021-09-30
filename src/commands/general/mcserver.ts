@@ -1,3 +1,4 @@
+import { SlashCommandBuilder } from "@discordjs/builders";
 import { CommandInteraction, MessageAttachment } from "discord.js";
 import { createEmbed, getAttachment } from "../../embeds/minecraftEmbed";
 import { pingServer } from '../utils/minecraftUtils';
@@ -6,16 +7,17 @@ import { pingServer } from '../utils/minecraftUtils';
 const ValidIpAddressRegex = "^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$";
 const ValidHostnameRegex = "^(([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.)*([A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\-]*[A-Za-z0-9])$";
 
+const slashCommand = new SlashCommandBuilder()
+    .setName('mcserver')
+    .setDescription('Gets the status of a Minecraft server')
+    .addStringOption(option =>
+        option.setName('hostname')
+        .setDescription('The IP address of the Minecraft server')
+        .setRequired(true))
+
 module.exports = {
-    name: 'mcserver',
+    data: slashCommand,
     category: 'General',
-    description: 'Gets the status of a Minecraft server',
-    options: [{
-        type: 'STRING',
-        name: 'hostname',
-        description: 'The IP address of the Minecraft server',
-        required: true
-    }],
     async execute(interaction: CommandInteraction) {
         let hostString = interaction.options.getString('hostname')!;
         let host = hostString.split(':');

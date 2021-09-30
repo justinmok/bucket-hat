@@ -1,16 +1,20 @@
-import { CommandInteraction } from "discord.js";
+import { SlashCommandBuilder } from "@discordjs/builders";
+import { CommandInteraction, GuildMember, Permissions } from "discord.js";
+
+const slashCommand = new SlashCommandBuilder()
+    .setName('eval')
+    .setDescription('Evaluates Javascript expressions')
+    .addStringOption(option =>
+        option.setName('expression')
+        .setDescription('The Javascript expression to run')
+        .setRequired(true))
 
 module.exports = {
-    name: 'eval',
+    data: slashCommand,
     category: 'Admin',
-    description: 'Evaluates Javascript expressions',
-    options: [{
-        type: 'STRING',
-        name: 'expression',
-        description: 'The Javascript expression to run',
-        required: true
-    }],
     execute(interaction: CommandInteraction) {
+        let member = interaction.member as GuildMember
+        if (!member.permissions.has(Permissions.FLAGS.MANAGE_CHANNELS)) interaction.reply('You must have the `Manage Channels` permission in order to use this command.')
         try {
             let expression = interaction.options.getString('expression')!;
             let evaled = require('util').inspect(eval(expression));

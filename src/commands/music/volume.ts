@@ -1,17 +1,18 @@
+import { SlashCommandBuilder } from '@discordjs/builders';
 import type { CommandInteraction } from 'discord.js';
 import type { BotClient } from '../../../typings/index';
 import { updateVolume } from '../../util';
 
+const slashCommand = new SlashCommandBuilder()
+    .setName('volume')
+    .setDescription('Changes the volume of the audio')
+    .addIntegerOption(option =>
+        option.setName('percent')
+            .setDescription('A number from 0-200')
+            .setRequired(true));
 module.exports = {
-    name: 'volume',
+    data: slashCommand,
     category: 'Music',
-    description: 'Changes the volume of the bot',
-    options: [{
-        type: 'INTEGER',
-        name: 'percent',
-        description: 'Number between 0 and 200',
-        required: true
-    }],
     execute(interaction: CommandInteraction) {
         let { musicQueue, audioPlayers } = interaction.client as BotClient;
         let guild = interaction.guild!.id!;

@@ -79,6 +79,7 @@ export const playQueue = async (connection: VoiceConnection, queue: Array<QueueI
 
         player.play(resource);
         resolve({player, resource});
+        console.log(`Now Playing: ${queue[0].match.title} with volume ${volume * 100}%`)
 
         const subscription = connection.subscribe(player);
 
@@ -87,7 +88,6 @@ export const playQueue = async (connection: VoiceConnection, queue: Array<QueueI
             subscription?.unsubscribe();
             playQueue(connection, queue, volume);
         }).on('error', err => reject(err));
-        console.log(`Now Playing: ${queue[0].match.title} with volume ${volume * 100}%`)
     });
 
 };

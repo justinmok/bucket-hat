@@ -1,3 +1,5 @@
+import type { SlashCommandBuilder } from '@discordjs/builders';
+import type { APIApplicationCommandOption } from 'discord-api-types/v9';
 import type { AudioPlayer, AudioResource } from '@discordjs/voice';
 import type * as Discord from 'discord.js';
 import type * as ytsr from "ytsr";
@@ -35,7 +37,15 @@ interface embed {
     createEmbed(...args): Discord.MessageEmbed;
 }
 
+interface SlashCommandDataJSON {
+    name: string;
+    description: string;
+    options: APIApplicationCommandOption[];
+    default_permission: boolean | undefined;
+}
 interface DiscordCommand extends Discord.ApplicationCommand {
+    data: SlashCommandBuilder
+    toJSON(): SlashCommandDataJSON
     category: 'Admin' | 'General' | 'Music' | 'Experimental',
     execute(...args): any
 }

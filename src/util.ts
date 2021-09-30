@@ -1,19 +1,7 @@
 import { Firestore } from '@google-cloud/firestore';
 import { request } from 'gaxios';
-
 import * as fs from 'fs';
-
 import type { BotConfig, DiscordCommand, geminiResponse, cryptoInfo } from '../typings/index';
-
-type prefixMap = Map<string, string>;
-
-interface sochainResponse {
-    success: boolean,
-    data: {
-        network: string,
-        prices: cryptoInfo[]
-    }
-}
 
 const db = new Firestore({
     projectId: 'keylimepie',
@@ -49,14 +37,14 @@ export const updateVolume = (serverId: string, volume: number) => {
 }
 
 export const getCommands = (): Promise<Map<string, DiscordCommand>> => {
-    let commandsCollection = new Map();
+    let commandsCollection: Map<string, DiscordCommand> = new Map();
     return new Promise<Map<string, DiscordCommand>>((resolve, reject) => {
         let commandsFolder = fs.readdirSync('./commands').filter(dir => !dir.includes('utils'));
         for (const folder of commandsFolder) {
             const commandFiles = fs.readdirSync(`./commands/${folder}`).filter(file => file.endsWith('.js'));
             for (const file of commandFiles) {
-                const command = require(`./commands/${folder}/${file}`);
-                commandsCollection.set(command.name, command);
+                const command: DiscordCommand = require(`./commands/${folder}/${file}`);
+                commandsCollection.set(command.data.toJSON().name, command);
             }
         }
         resolve(commandsCollection);
