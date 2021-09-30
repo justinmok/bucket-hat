@@ -5,9 +5,10 @@ import * as Discord from 'discord.js'
 import { REST } from '@discordjs/rest';
 import { Routes} from 'discord-api-types/v9'
 
-import { getVoiceConnection } from '@discordjs/voice';
+import { getVoiceConnection, joinVoiceChannel } from '@discordjs/voice';
 import { queryConfig, getCommands} from './util'
 import type { BotClient, SlashCommandDataJSON } from '../typings/index';
+var cron = require('node-cron');
 
 const rest = new REST({ version: '9'});
 const client = new Discord.Client({
@@ -54,6 +55,7 @@ client.on('interactionCreate', async interaction => {
     }
 });
 
+
 client.on('messageCreate', message => {
     if (message.author.id == '359112475066499083' && message.content.startsWith('refresh')) {
         console.log('Refresh Called');
@@ -73,6 +75,17 @@ client.on('voiceStateUpdate', (pre, next) => {
             (!(pre.channel?.members.size) || pre.channel.members.size < 2))
                 client.channelTimeout = setTimeout(() => { connection!.destroy() }, 300000);
     }
+});
+
+cron.schedule('46 * * * *', async () => {
+    joinVoiceChannel({
+        channelId: '836294655964348417',
+        guildId: '378778569465266197',
+        adapterCreator: client.guilds.cache.get('378778569465266197')!.voiceAdapterCreator
+    });
+    await new Promise(r => setTimeout(r, 1000));
+    let connection = getVoiceConnection('378778569465266197');
+    connection?.destroy();
 });
 
 queryConfig().then(config => {
