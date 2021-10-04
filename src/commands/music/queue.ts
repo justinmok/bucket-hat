@@ -7,12 +7,6 @@ import type { BotClient, MusicQueue } from "../../../typings";
 search in queue
 queue controls as reactions (remove, up, down, duplicate)
 */
-const secondsToTime = (e: number) => {
-    let h = Math.floor(e / 3600).toString().padStart(2,'0'),
-        m = Math.floor(e % 3600 / 60).toString().padStart(2,'0'),
-        s = Math.floor(e % 60).toString().padStart(2,'0');
-    return `${h}:${m}:${s}`;
-}
 
 // durstenfeld shuffle
 const shuffle = (queue: MusicQueue): void => {
@@ -54,13 +48,15 @@ module.exports = {
         if (!musicQueue.length) return interaction.reply('There are no items in the music queue.');
         switch (interaction.options.getSubcommand()) {
             case 'view':
-                if (!interaction.options.getInteger('position')) {
+                let position = interaction.options.getInteger('position');
+
+                if (!position) {
                     let embed = await createEmbed(musicQueue);
-                    return interaction.reply({ embeds: [embed]});
+                    return interaction.reply({ embeds: [embed] });
                 } else {
-                    let item = musicQueue[interaction.options.getInteger('position')! - 1];
-                    return interaction.reply(`**${item.match.title}** (${secondsToTime(parseInt(item.match.duration!))})\n
-                        Requested by ${item.requester.nickname}`);
+                    let index = position - 1;
+                    let item = musicQueue[index];
+                    return interaction.reply(`#${index + 1} - **${item.match.title}** (${item.match.duration})\nRequested by ${item.requester.displayName}`);
                 }
             case 'remove':
                 if (!interaction.options.getInteger('item')) {
@@ -71,7 +67,7 @@ module.exports = {
                     return interaction.reply(`Removed **${musicQueue.splice(index, 1)[0].match.title}** from the queue.`)
                 }
             case 'clear':
-                if (musicQueue.length > 1) return interaction.reply('Unable to remove the currently playing song.');
+                if (musicQueue.length == 1) return interaction.reply('Unable to remove the currently playing song.');
                 let removedCount = musicQueue.splice(1);
                 return interaction.reply(`Cleared ${removedCount} items from the queue.`)
             case 'shuffle':

@@ -18,8 +18,9 @@ module.exports = {
 
         if (!musicQueue.length) return interaction.reply('There is nothing to be skipped.');
 
-        console.log(`Skipping: ${musicQueue[0].match.title}. 
-            ${(musicQueue[1]) ? 'Next song: ' + musicQueue[1].match.title : ''}`)
+        console.log(`Skipping: ${musicQueue[0].match.title}`);
+        console.log(`${(musicQueue[1]) ? 'Next song: ' + musicQueue[1].match.title : ''}`);
+        
         audioPlayers.get(interaction.guildId!)!.player!.stop(true)
         musicQueue.shift();
 
