@@ -66,9 +66,9 @@ module.exports = {
                 if (!interaction.options.getInteger('item')) {
                     return interaction.reply(`Removed **${musicQueue.shift()?.match.title}** from the queue.`)
                 } else {
-                    let index = interaction.options.getInteger('item')!;
+                    let index = interaction.options.getInteger('item')! - 1;
                     if (index === 0) return interaction.reply('Unable to remove the currently playing song.')
-                    return interaction.reply(`Removed **${musicQueue.splice(index)} from the queue.`)
+                    return interaction.reply(`Removed **${musicQueue.splice(index, 1)[0].match.title}** from the queue.`)
                 }
             case 'clear':
                 if (musicQueue.length > 1) return interaction.reply('Unable to remove the currently playing song.');
