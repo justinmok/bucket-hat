@@ -1,6 +1,7 @@
 /*
 todo: permissions based commands
 */
+
 import * as Discord from 'discord.js'
 import { REST } from '@discordjs/rest';
 import { Routes} from 'discord-api-types/v9'
@@ -8,14 +9,18 @@ import { Routes} from 'discord-api-types/v9'
 import { getVoiceConnection, joinVoiceChannel } from '@discordjs/voice';
 import { queryConfig, getCommands} from './util'
 import type { BotClient, SlashCommandDataJSON } from '../typings/index';
+//import { scanForWishes } from './commands/utils/mudaeUtils';
 var cron = require('node-cron');
 
 const rest = new REST({ version: '9'});
 const client = new Discord.Client({
     intents: ['GUILDS', 'GUILD_MESSAGES', 'GUILD_VOICE_STATES', 'GUILD_MESSAGE_REACTIONS', 'GUILD_MEMBERS']
 }) as BotClient;
-const CLIENT_ID = '464186918457049088';
+const TEST_CLIENT_ID = '464186918457049088';
 
+global.client = client;
+
+client.mudaeWishes = new Map();
 client.commands = new Map();
 client.musicQueue = [];
 client.audioPlayers = new Map();
@@ -35,10 +40,10 @@ client.once('ready', async () => {
 
     if (process.env.NODE_ENV == 'dev') {
         /* debugging guilds */
-        await rest.put(Routes.applicationGuildCommands(CLIENT_ID, '378778569465266197'), { body: data });
-        await rest.put(Routes.applicationGuildCommands(CLIENT_ID, '676293029879087104'), { body: data });
+        await rest.put(Routes.applicationGuildCommands(TEST_CLIENT_ID, '378778569465266197'), { body: data });
+        await rest.put(Routes.applicationGuildCommands(TEST_CLIENT_ID, '676293029879087104'), { body: data });
     } else {
-        await rest.put(Routes.applicationCommands(CLIENT_ID), { body: data });
+        await rest.put(Routes.applicationCommands('783886978974220338'), { body: data });
     }
     await client.application?.commands.fetch();
     console.log(`Loaded ${client.application?.commands.cache.size} commands.`);
@@ -55,9 +60,15 @@ client.on('interactionCreate', async interaction => {
     }
 });
 
-
+/* 
 client.on('messageCreate', message => {
-    if (message.author.id == '359112475066499083' && message.content.startsWith('refresh')) {
+    if (message.author.id === '432610292342587392' && message.embeds.length > 0) {
+        scanForWishes(message.guildId!, message.embeds[0]).then(wishes => {
+            let wishers = wishes.map(wish => wish.userId);
+            message.reply(`Wished by ${wishers.shift()}>${wishers.map(wisher => ' <!' + wisher + '>')}!`);
+        });
+    }
+    if (message.author.id === '359112475066499083' && message.content.startsWith('refresh')) {
         console.log('Refresh Called');
         client.application?.commands.fetch().then(async cmds => {
             for (const cmd of cmds) await client.application?.commands.delete(cmd[1]);
@@ -65,6 +76,7 @@ client.on('messageCreate', message => {
         })
     }
 });
+*/
 
 // AFK Timeout (5 minutes)
 client.on('voiceStateUpdate', (pre, next) => {

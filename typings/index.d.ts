@@ -1,12 +1,22 @@
 import type { SlashCommandBuilder } from '@discordjs/builders';
 import type { APIApplicationCommandOption } from 'discord-api-types/v9';
 import type { AudioPlayer, AudioResource } from '@discordjs/voice';
+import type { Client } from 'discord.js';
 import type * as Discord from 'discord.js';
 import type * as ytsr from "ytsr";
+
+declare global {
+    namespace NodeJS {
+        interface Global {
+            client: BotClient;
+        }
+    }
+}
 interface BotClient extends Discord.Client {
     commands: Map<string, DiscordCommand>,
     audioPlayers: Map<string, AudioPlayerWithResource>
     musicQueue: MusicQueue,
+    mudaeWishes: Map<string, MudaeWish[]>
     cloudProjectId?: string,
     channelTimeout: NodeJS.Timeout | null;
 }
