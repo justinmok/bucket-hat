@@ -63,6 +63,7 @@ module.exports = {
             case 'view': {
                 let userId = interaction.user.id;
                 fetchWishes(interaction.guildId!, userId).then(wishes => {
+                    console.log(wishes);
                     if (!wishes.length) interaction.reply('No wishes found.');
                     else interaction.reply(`${wishes.map(wish => wish.name) + ', '}`);
                 })
@@ -76,7 +77,7 @@ module.exports = {
                 let type = <'char' | 'series'>interaction.options.getString('type');
                 let wish = ({ name, type, isClaimed: false, userId });
                 addWish(interaction.guildId!, wish).then(() =>
-                    interaction.reply(`Added ${wish}`)
+                    interaction.reply(`Added ${wish.name}`)
                 );
                 break;
             }
