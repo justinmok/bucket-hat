@@ -77,17 +77,6 @@ client.on('voiceStateUpdate', (pre, next) => {
     }
 });
 
-cron.schedule('46 * * * *', async () => {
-    joinVoiceChannel({
-        channelId: '836294655964348417',
-        guildId: '378778569465266197',
-        adapterCreator: client.guilds.cache.get('378778569465266197')!.voiceAdapterCreator
-    });
-    await new Promise(r => setTimeout(r, 1000));
-    let connection = getVoiceConnection('378778569465266197');
-    connection?.destroy();
-});
-
 queryConfig().then(config => {
     let token = config.token;
     if (process.env.NODE_ENV == 'dev') token = config.testToken;

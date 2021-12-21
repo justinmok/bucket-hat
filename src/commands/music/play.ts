@@ -2,7 +2,7 @@ import type { CommandInteraction, GuildMember } from "discord.js";
 import type { BotClient, VideoResult } from "../../../typings";
 import { getVolume } from "../../util";
 
-import { getVoiceConnection, joinVoiceChannel } from '@discordjs/voice'
+import { DiscordGatewayAdapterCreator, getVoiceConnection, joinVoiceChannel } from '@discordjs/voice'
 import { playQueue, processQuery } from '../utils/musicUtils'
 import { SlashCommandBuilder } from "@discordjs/builders";
 
@@ -33,7 +33,7 @@ module.exports = {
         joinVoiceChannel({
             channelId: userVoice.channel.id,
             guildId: user.guild.id,
-            adapterCreator: user.guild.voiceAdapterCreator
+            adapterCreator: user.guild.voiceAdapterCreator as DiscordGatewayAdapterCreator
         })
 
         let connection = getVoiceConnection(interaction.guildId!);
