@@ -5,6 +5,7 @@
       "target": "ES6",
       "types": ["node"],
       "strictNullChecks": true,
+      "esModuleInterop": true,
       "typeRoots": ["./typings"],
       "paths": {"*": ["./typings/*"]},
       "skipLibCheck": true,

@@ -1,7 +1,7 @@
 import { SlashCommandBuilder } from "@discordjs/builders";
 import { createEmbed } from '../../embeds/queueEmbed';
 import type { CommandInteraction } from "discord.js";
-import type { BotClient, MusicQueue } from "../../../typings";
+import type { MusicQueue } from "../../../typings";
 
 /* TODO:
 search in queue
@@ -44,7 +44,7 @@ module.exports = {
     data: slashCommand,
     category: 'Music',
     async execute(interaction: CommandInteraction) {
-        const { musicQueue } = interaction.client as BotClient;
+        const { musicQueue } = interaction.client;
         if (!musicQueue.length) return interaction.reply('There are no items in the music queue.');
         switch (interaction.options.getSubcommand()) {
             case 'view':

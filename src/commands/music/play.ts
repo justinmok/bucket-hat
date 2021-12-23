@@ -1,5 +1,5 @@
 import type { CommandInteraction, GuildMember } from "discord.js";
-import type { BotClient, VideoResult } from "../../../typings";
+import type { VideoResult } from "../../../typings";
 import { getVolume } from "../../util";
 
 import { DiscordGatewayAdapterCreator, getVoiceConnection, joinVoiceChannel } from '@discordjs/voice'
@@ -19,7 +19,7 @@ module.exports = {
     playQueue,
     execute(interaction: CommandInteraction) {
         if (!interaction.options.getString('query')) return;
-        let client = interaction.client as BotClient;
+        let client = interaction.client;
         let user = interaction.member as GuildMember;
         let userVoice = user!.voice;
         let { musicQueue } = client;
@@ -47,8 +47,13 @@ module.exports = {
                 interaction.editReply(`Now playing ${songs[0].title} in ${userVoice!.channel!.name}`);
             }
             else interaction.editReply(`Added ${(songs.length > 1) ? songs.length + ' items ' : songs[0].title} to the queue.`);
-        }).catch(err => console.log(err));
-
+        }).catch(err => {
+            client.logger.log({
+                level: 'error',
+                label: 'music',
+                message: err,
+            });
+        });
         if (client.channelTimeout) clearTimeout(client.channelTimeout);
     },
 };

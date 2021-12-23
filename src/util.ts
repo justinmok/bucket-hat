@@ -1,6 +1,7 @@
 import { Firestore } from '@google-cloud/firestore';
 import { request } from 'gaxios';
-import * as fs from 'fs';
+import fs = require('fs');
+
 import type { BotConfig, DiscordCommand, geminiResponse, cryptoInfo } from '../typings/index';
 
 const db = new Firestore({

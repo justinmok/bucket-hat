@@ -1,35 +1,36 @@
-/*
-todo: permissions based commands
-*/
-import * as Discord from 'discord.js'
+import Discord = require('discord.js');
 import { REST } from '@discordjs/rest';
 import { Routes} from 'discord-api-types/v9'
 
-import { getVoiceConnection, joinVoiceChannel } from '@discordjs/voice';
+import { getVoiceConnection } from '@discordjs/voice';
 import { queryConfig, getCommands} from './util'
-import type { BotClient, SlashCommandDataJSON } from '../typings/index';
-var cron = require('node-cron');
+import { logger } from './log'
+import type { SlashCommandDataJSON } from '../typings/index';
 
 const rest = new REST({ version: '9'});
 const client = new Discord.Client({
     intents: ['GUILDS', 'GUILD_MESSAGES', 'GUILD_VOICE_STATES', 'GUILD_MESSAGE_REACTIONS', 'GUILD_MEMBERS']
-}) as BotClient;
+});
 const TEST_CLIENT_ID = '464186918457049088';
 
 client.commands = new Map();
 client.musicQueue = [];
 client.audioPlayers = new Map();
+client.logger = logger;
 
 client.once('ready', async () => {
     if (client.user)
-    console.log(`Succesfully logged into ${client.user.tag}`);
+    client.logger.log({
+        level: 'info',
+        label: 'main',
+        message: `Succesfully logged into ${client.user.tag}`
+    });
     
     let commands = await getCommands();
     client.commands = commands;
 
     let data: SlashCommandDataJSON[] = [];
-    for (let [k,v] of commands) {            
-        console.log(`Pushing ${k} to commands`);
+    for (let [k, v] of commands) {            
         data.push(v.data.toJSON())
     }
 
@@ -41,7 +42,11 @@ client.once('ready', async () => {
         await rest.put(Routes.applicationCommands('783886978974220338'), { body: data });
     }
     await client.application?.commands.fetch();
-    console.log(`Loaded ${client.application?.commands.cache.size} commands.`);
+    client.logger.log({
+        level: 'info',
+        label: 'main',
+        message: `Loaded ${client.application?.commands.cache.size} commands.`
+    });
 });
 
 client.on('interactionCreate', async interaction => {
@@ -49,38 +54,58 @@ client.on('interactionCreate', async interaction => {
     const command = interaction.commandName;
     try {
         client.commands.get(command)?.execute(interaction);
+        client.logger.log({
+            level: 'verbose',
+            label: 'main',
+            guild: interaction.guild,
+            channel: interaction.channel,
+            user: interaction.user,
+            message: `Ran command ${command}`
+        });
     } catch (e) {
-        console.log(e);
-        interaction.webhook.send(`OOPSIE WOOPSIE!! Uwu We make a fucky wucky!! A wittle fucko boingo! The code monkeys <@148521718388883456> at our headquarters are working VEWY HAWD to fix this! There was an error executing \`${command}\`.\nStacktrace: \`\`\`${e.stack}\`\`\``)
-    }
+        client.logger.log({
+            level: 'error',
+            label: 'main',
+            message: e
+        });
+        }
 });
 
-
 client.on('messageCreate', message => {
-    if (message.author.id == '359112475066499083' && message.content.startsWith('refresh')) {
-        console.log('Refresh Called');
+    let hasPermissions = message.member?.permissions.has(Discord.Permissions.FLAGS.ADMINISTRATOR);
+    if (hasPermissions && message.content.startsWith('.refresh')) {
+        client.logger.log({
+            level: 'info',
+            label: 'main',
+            message: `Application command refresh called by ${message.author.username}!`
+        });
         client.application?.commands.fetch().then(async cmds => {
             for (const cmd of cmds) await client.application?.commands.delete(cmd[1]);
-            console.log('Refresh - Removed all commands');
-        })
+        });
     }
 });
 
 // AFK Timeout (5 minutes)
-client.on('voiceStateUpdate', (pre, next) => {
+client.on('voiceStateUpdate', (pre) => {
     let connection = getVoiceConnection(pre.guild.id);
     if (client.musicQueue.length == 0 && connection) {
-        let channelId = connection?.joinConfig.channelId;
-        if (channelId == pre.channel?.id &&
-            (!(pre.channel?.members.size) || pre.channel.members.size < 2))
-                client.channelTimeout = setTimeout(() => { connection!.destroy() }, 300000);
+        let channelId = connection!.joinConfig.channelId,
+            beforeChannelId = pre.channel?.id,
+            isAlone = (!(pre.channel?.members.size) || pre.channel.members.size < 2);
+        if (channelId == beforeChannelId && isAlone) {
+            setTimeout(() => { connection!.destroy() }, 300000);
+        }      
     }
 });
 
 queryConfig().then(config => {
     let token = config.token;
     if (process.env.NODE_ENV == 'dev') token = config.testToken;
-    console.log(`Logging in with token ***********${token.slice(-8)}`);
+    client.logger.log({
+        level: 'info',
+        label: 'main',
+        message: `Logging in with token ***********${token.slice(-8)}`
+    });
     rest.setToken(token)
     client.login(token);
 });

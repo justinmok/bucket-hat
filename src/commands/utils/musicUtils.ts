@@ -1,25 +1,24 @@
-import type { CommandInteraction, GuildMember } from "discord.js";
-import { VoiceConnection, createAudioPlayer, NoSubscriberBehavior, createAudioResource, demuxProbe, AudioPlayerStatus, AudioPlayer, AudioResource } from "@discordjs/voice"
-import type { Result } from "ytsr";
-import type { AudioPlayerWithResource, BotClient, QueueItem, VideoResult } from '../../../typings/index';
 import { getTracks } from 'spotify-url-info';
 import { getInfo } from 'ytdl-core';
-import * as ytsr from 'ytsr';
-import { Readable, Stream } from "stream";
+import ytsr = require('ytsr');
+import { Readable } from "stream";
+import { logger } from '../../log';
+
+import { VoiceConnection, createAudioPlayer, NoSubscriberBehavior, createAudioResource, AudioPlayerStatus } from "@discordjs/voice"
+import type { AudioPlayerWithResource, QueueItem, VideoResult } from '../../../typings/index';
+import type { CommandInteraction, GuildMember } from "discord.js";
 
 const ytdl = require('ytdl-core-discord');
 const ytRegex = /(youtu\.be|youtube\.com)/;
 const spotifyRegex = /(:|\/)([A-z0-9]{22})/;
 
-
 const search = (query: string, resultCount: number = 1): Promise<VideoResult[]> => {
-    console.log(`Searching for ${query}`);
     return new Promise<Array<VideoResult>>(async (resolve, reject) => {
         if (query.match(ytRegex)) resolve([await parseUrl(query)]);
         ytsr.getFilters(query).then(async filters => {
             let filter = await filters.get('Type')?.get('Video');
             if (filter && filter.url) {
-                let results: Result = await ytsr(filter.url, { limit: resultCount });
+                let results: ytsr.Result = await ytsr(filter.url, { limit: resultCount });
                 resolve(<VideoResult[]>results.items);
             } else {
                 reject(`Search failed.`)
@@ -78,8 +77,13 @@ export const playQueue = async (connection: VoiceConnection, queue: Array<QueueI
         resource.volume!.setVolume(volume);
 
         player.play(resource);
-        resolve({player, resource});
-        console.log(`Now Playing: ${queue[0].match.title} with volume ${volume * 100}%`)
+        resolve({ player, resource });
+        
+        logger.log({
+            level: 'info',
+            label: 'main',
+            message: `Now Playing: ${queue[0].match.title} with volume ${volume * 100}%`
+        });
 
         const subscription = connection.subscribe(player);
 
@@ -92,10 +96,9 @@ export const playQueue = async (connection: VoiceConnection, queue: Array<QueueI
 
 };
 
-
 export const processQuery = (interaction: CommandInteraction): Promise<VideoResult[]> => {
     return new Promise<VideoResult[]>(async (resolve, reject) => {
-        let { musicQueue } = interaction.client as BotClient;
+        let { musicQueue } = interaction.client;
         let query = interaction.options.getString('query')!;
         if (query.match(spotifyRegex)) {
             getSongsFromSpotify(query).then(results => {

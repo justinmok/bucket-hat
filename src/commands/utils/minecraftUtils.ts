@@ -1,6 +1,10 @@
-import * as net from 'net';
+import net = require('net');
 import { MinecraftResponse } from '../../../typings';
 
+enum Minecraft {
+    PROTOCOL_VERSION = 754,
+    SERVER_PORT = 25565,
+}
 
 // https://github.com/chrisdickinson/varint/blob/323cb66c382744fecd6af378bff145bc59b8af66/encode.js
 const MSB = 0x80
@@ -8,7 +12,7 @@ const MSB = 0x80
   , MSBALL = ~REST
   , INT = Math.pow(2, 31)
 
-const encode = (num): Buffer => {
+const encode = (num: number): Buffer => {
       let out: number[] = [];
       let offset = 0;
     
@@ -26,7 +30,7 @@ const encode = (num): Buffer => {
 }
 
 const packetId = encode(0);
-const protocolVersion = encode(754);
+const protocolVersion = encode(Minecraft.PROTOCOL_VERSION);
 const state = encode(1);
 const followUp = Buffer.from([0x01, 0x00]);
 
@@ -42,7 +46,7 @@ const createPacket = (host: string, port: number): Buffer => {
     return Buffer.concat([encode(length), ...packet]);
 }
 
-export const pingServer = (host: string, port: number = 25565): Promise<MinecraftResponse> => {
+export const pingServer = (host: string, port: number = Minecraft.SERVER_PORT): Promise<MinecraftResponse> => {
     return new Promise<MinecraftResponse>((resolve, reject) => {
         const client = new net.Socket()
         client.setTimeout(10000);
@@ -59,28 +63,25 @@ export const pingServer = (host: string, port: number = 25565): Promise<Minecraf
             client.write(followUp);
         });
         
-        console.log(`Pinging ${host} on port ${port}`);
-
         client.on('data', (data) => {
             raw = Buffer.concat([raw, data]);
             // Looks for `}}` termination
+            /*
             console.log(raw.lastIndexOf('7d', raw.length, 'hex'));
             console.log(raw.length - 1);
+            */
 
             if (raw.lastIndexOf('7d', 111111111111111, 'hex') == raw.length - 1) {
-                // parse json from `{"d`
                 console.log(`start index: ${raw.indexOf('7b22', 0, 'hex')}`);
                 let rawResponse = JSON.parse(raw.slice(raw.indexOf('7b22', 0, 'hex')).toString('ascii'));
                 response = { ...rawResponse, favicon: rawResponse.favicon?.slice('22').replace('\n', '')};
                 client.destroy();
                 response.ping = latency;
-                //console.log(response);
                 resolve(response);
             }
         });
         
         client.on('error', (err) => {
-            //console.log(err);
             client.destroy();
             reject(err);
         });
