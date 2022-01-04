@@ -21,7 +21,7 @@ enum ClientEnums {
 }
 
 client.commands = new Map();
-client.musicQueue = [];
+client.musicQueueManager = new Discord.Collection;
 client.audioPlayers = new Map();
 client.logger = logger;
 
@@ -76,7 +76,7 @@ client.on('interactionCreate', async interaction => {
         client.logger.log({
             level: 'error',
             label: 'main',
-            message: e
+            message: e.stack
         });
     }
 });
@@ -98,14 +98,16 @@ client.on('messageCreate', message => {
 
 /* AFK Timeout (5 minutes) */
 client.on('voiceStateUpdate', (pre) => {
-    let connection = getVoiceConnection(pre.guild.id);
-    if (client.musicQueue.length == 0 && connection) {
+    let connection = getVoiceConnection(pre.guild.id),
+        queue = client.musicQueueManager.get(pre.guild.id)!;
+    if (!queue) return;
+    else if ((queue.length == 0) && connection) {
         let channelId = connection!.joinConfig.channelId,
             beforeChannelId = pre.channel?.id,
             isAlone = (!(pre.channel?.members.size) || pre.channel.members.size < 2);
         if (channelId == beforeChannelId && isAlone) {
             /* Leave channel after 5 minutes */
-            setTimeout(() => { connection!.destroy() }, ClientEnums.AFK_TIMEOUT_MINUTES * 60 * 1000); 
+            queue.leaveTimeout = setTimeout(() => { connection!.destroy() }, ClientEnums.AFK_TIMEOUT_MINUTES * 60 * 1000); 
         }
     }
 });

@@ -1,5 +1,5 @@
 import { SlashCommandBuilder } from "@discordjs/builders";
-import type { CommandInteraction } from "discord.js";
+import type { Client, CommandInteraction } from "discord.js";
 
 const slashCommand = new SlashCommandBuilder()
     .setName('pause')
@@ -9,7 +9,10 @@ module.exports = {
     data: slashCommand,
     category: 'Music',
     execute(interaction: CommandInteraction) {
-        let { musicQueue, audioPlayers } = interaction.client;
-        if (musicQueue.length) audioPlayers.get(interaction.guildId!)!.player.pause();
+        const client: Client<true, any> = interaction.client;
+        let musicQueue = client.musicQueueManager.get(interaction.guildId);
+        
+        if (!musicQueue || musicQueue.length)
+            client.audioPlayers.get(interaction.guildId!)!.player.pause();
     }
 }

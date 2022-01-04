@@ -11,7 +11,7 @@ export const createEmbed = (response: MinecraftResponse): Promise<MessageEmbed> 
         .addField('MOTD/Description', response.description.text ?? response.description)
         .addField('Ping', `${response.ping}ms`, true)
         .addField('Players Online', `${response.players.online} / ${response.players.max}`, true)
-        .setFooter('Bucket Hat Bot', 'https://cdn.discordapp.com/avatars/783886978974220338/9e5abce14cce133de8c6145e556ee725.png?size=32');
+        .setFooter('bucket hat bot', 'https://cdn.discordapp.com/avatars/783886978974220338/9e5abce14cce133de8c6145e556ee725.png?size=32');
     
         if (!response.favicon) resolve(embed.setThumbnail('https://packpng.com/static/pack.png'))
         else {

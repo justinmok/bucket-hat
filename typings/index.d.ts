@@ -4,12 +4,13 @@ import { AudioPlayer, AudioResource } from '@discordjs/voice';
 import type { ApplicationCommand, Collection, AudioPlayer } from 'discord.js';
 import type * as ytsr from "ytsr";
 import type { Logger } from 'winston';
+import type { MusicQueue } from '../src/commands/utils/musicUtils';
 
 declare module 'discord.js' {
     interface Client<T> {
         commands: Map<string, DiscordCommand>,
         audioPlayers: Map<string, AudioPlayerWithResource>
-        musicQueue: MusicQueue,
+        musicQueueManager: Collection<string, MusicQueue>,
         cloudProjectId?: string,
         logger: Logger
     };
@@ -24,17 +25,7 @@ interface BotConfig {
     testToken: string,
 }
 
-interface VideoResult extends Omit<ytsr.Video, 'bestThumbnail' | 'author' | 'isUpcoming' | 'views' |'isLive' | 'badges' | 'isComing' | 'upcoming' | 'uploadedAt' | 'description'> {
-    
-}
-
-interface QueueItem {
-    match: VideoResult,
-    query: string,
-    requester: GuildMember
-}
-
-type MusicQueue = Array<QueueItem>;
+type VideoResult = Omit<ytsr.Video, 'bestThumbnail' | 'author' | 'isUpcoming' | 'views' |'isLive' | 'badges' | 'isComing' | 'upcoming' | 'uploadedAt' | 'description'> 
 
 interface embed {
     name: string,

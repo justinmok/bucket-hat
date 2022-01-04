@@ -1,6 +1,6 @@
 import { SlashCommandBuilder } from '@discordjs/builders';
 import { getVoiceConnection } from '@discordjs/voice';
-import type { CommandInteraction } from 'discord.js';
+import type { Client, CommandInteraction } from 'discord.js';
 import { playQueue } from '../utils/musicUtils';
 
 const slashCommand = new SlashCommandBuilder()
@@ -12,20 +12,21 @@ module.exports = {
     category: 'General',
 
     execute(interaction: CommandInteraction) {
-        let { musicQueue, audioPlayers } = interaction.client;
+        const client: Client<true, any> = interaction.client;
+        let musicQueue = client.musicQueueManager.get(interaction.guildId);
         let connection = getVoiceConnection(interaction.guildId!);
 
-        if (!musicQueue.length) return interaction.reply('There is nothing to be skipped.');
+        if (!musicQueue || !musicQueue.length) return interaction.reply('There is nothing to be skipped.');
 
-        interaction.client.logger.log({
+        client.logger.log({
             level: 'info',
             label: 'main',
-            message: `Skipping: ${musicQueue[0].match.title}.
-            ${(musicQueue[1]) ? 'Next song: ' + musicQueue[1].match.title : ''}`
+            message: `Skipping: ${musicQueue.items[0].match.title}.
+            ${(musicQueue.items[1]) ? 'Next song: ' + musicQueue.items[1].match.title : ''}`
         });
         
-        audioPlayers.get(interaction.guildId!)!.player!.stop(true)
-        musicQueue.shift();
+        client.audioPlayers.get(interaction.guildId!)!.player!.stop(true)
+        musicQueue.items.shift();
 
         if (connection) playQueue(connection, musicQueue);
         interaction.reply('Skipped!');

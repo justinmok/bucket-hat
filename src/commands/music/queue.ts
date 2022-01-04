@@ -1,20 +1,13 @@
 import { SlashCommandBuilder } from "@discordjs/builders";
 import { createEmbed } from '../../embeds/queueEmbed';
-import type { CommandInteraction } from "discord.js";
-import type { MusicQueue } from "../../../typings";
+import type { Client, CommandInteraction } from "discord.js";
+import { DiscordGatewayAdapterCreator } from "@discordjs/voice";
+import { QueueItem } from "../utils/musicUtils";
 
 /* TODO:
 search in queue
 queue controls as reactions (remove, up, down, duplicate)
 */
-
-// durstenfeld shuffle
-const shuffle = (queue: MusicQueue): void => {
-    for (let i = queue.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [queue[i], queue[j]] = [queue[j], queue[i]];
-    }
-};
 
 const slashCommand = new SlashCommandBuilder()
     .setName('queue')
@@ -44,38 +37,48 @@ module.exports = {
     data: slashCommand,
     category: 'Music',
     async execute(interaction: CommandInteraction) {
-        const { musicQueue } = interaction.client;
-        if (!musicQueue.length) return interaction.reply('There are no items in the music queue.');
+        const client: Client<true, any> = interaction.client;
+        
+        let queue = client.musicQueueManager.get(interaction.guildId);
+        if (!queue || !queue.length) return interaction.reply('There are no items in the music queue.');
         switch (interaction.options.getSubcommand()) {
             case 'view':
                 let position = interaction.options.getInteger('position');
-
                 if (!position) {
-                    let embed = await createEmbed(musicQueue);
+                    let embed = await createEmbed(queue.items);
                     return interaction.reply({ embeds: [embed] });
                 } else {
-                    let index = position - 1;
-                    let item = musicQueue[index];
-                    return interaction.reply(`#${index + 1} - **${item.match.title}** (${item.match.duration})\nRequested by ${item.requester.displayName}`);
+                    let index = position - 1,
+                        item = queue.items[index],
+                        { title, duration } = item.match,
+                        requester = item.requester.displayName;
+
+                    return interaction.reply(`#${index + 1} - **${title}** (${duration})
+                    Requested by ${requester}`);
                 }
             case 'remove':
-                if (!interaction.options.getInteger('item')) {
-                    return interaction.reply(`Removed **${musicQueue.shift()?.match.title}** from the queue.`)
-                } else {
-                    let index = interaction.options.getInteger('item')! - 1;
-                    if (index === 0) return interaction.reply('Unable to remove the currently playing song.')
-                    return interaction.reply(`Removed **${musicQueue.splice(index, 1)[0].match.title}** from the queue.`)
-                }
+                let index = interaction.options.getInteger('position');
+                queue.remove(index).then(song => {
+                    return interaction.reply(`Removed ${song}`);
+                }).catch(err => {
+                    return interaction.reply(err);
+                });
+
             case 'clear':
-                if (musicQueue.length == 1) return interaction.reply('Unable to remove the currently playing song.');
-                let removedCount = musicQueue.splice(1);
-                return interaction.reply(`Cleared ${removedCount} items from the queue.`)
+                queue.clear().then(removedCount => {
+                    return interaction.reply(`Cleared ${removedCount} items from the queue.`)
+                }).catch(err => {
+                    return interaction.reply(err);
+                });      
+                
             case 'shuffle':
-                let temp = musicQueue.shift();
-                shuffle(musicQueue);
-                if (temp) musicQueue.unshift(temp);
-                return interaction.reply(`Shuffled ${musicQueue.length - 1} songs`);
+                let temp = queue.items.shift();
+                queue.shuffle();
+                if (temp) queue.items.unshift(temp);
+                return interaction.reply(`Shuffled ${queue.length - 1} songs`);
+
             default: break;
         }
     },
 };
+

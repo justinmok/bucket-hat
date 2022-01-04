@@ -1,9 +1,9 @@
-import type { CommandInteraction, GuildMember } from "discord.js";
+import type { Client, CommandInteraction, GuildMember } from "discord.js";
 import type { VideoResult } from "../../../typings";
 import { getVolume } from "../../util";
 
 import { DiscordGatewayAdapterCreator, getVoiceConnection, joinVoiceChannel } from '@discordjs/voice'
-import { playQueue, processQuery } from '../utils/musicUtils'
+import { MusicQueue, playQueue, processQuery } from '../utils/musicUtils'
 import { SlashCommandBuilder } from "@discordjs/builders";
 
 const slashCommand = new SlashCommandBuilder()
@@ -18,12 +18,19 @@ module.exports = {
     category: 'Music',
     playQueue,
     execute(interaction: CommandInteraction) {
-        if (!interaction.options.getString('query')) return;
-        let client = interaction.client;
-        let user = interaction.member as GuildMember;
-        let userVoice = user!.voice;
-        let { musicQueue } = client;
-        let isPlaying = musicQueue.length != 0;
+        const client: Client<true, any> = interaction.client;
+        let user = interaction.member as GuildMember,
+            userVoice = user!.voice,
+            guildId = interaction.guildId,
+            { musicQueueManager } = client,
+            queue = musicQueueManager.get(guildId);
+
+        if (!queue) {
+            queue = new MusicQueue(guildId);
+            musicQueueManager.set(guildId, queue);
+        }
+
+        let isPlaying = queue.length != 0;
 
         if (!userVoice.channel)
             return interaction.reply('Join a voice channel to use this command.');
@@ -42,11 +49,12 @@ module.exports = {
         processQuery(interaction).then(async (songs: VideoResult[]) => {
             if (!isPlaying) {
                 let volume = await getVolume(interaction.guild!.id)
-                playQueue(connection!, musicQueue, volume)
+                playQueue(connection!, queue!, volume)
                     .then(player => client.audioPlayers.set(interaction.guildId!, player));
                 interaction.editReply(`Now playing ${songs[0].title} in ${userVoice!.channel!.name}`);
             }
             else interaction.editReply(`Added ${(songs.length > 1) ? songs.length + ' items ' : songs[0].title} to the queue.`);
+            global.clearTimeout(queue!.leaveTimeout);
         }).catch(err => {
             client.logger.log({
                 level: 'error',
@@ -54,6 +62,6 @@ module.exports = {
                 message: err,
             });
         });
-        if (client.channelTimeout) clearTimeout(client.channelTimeout);
+        
     },
 };

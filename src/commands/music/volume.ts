@@ -1,5 +1,5 @@
 import { SlashCommandBuilder } from '@discordjs/builders';
-import type { CommandInteraction } from 'discord.js';
+import type { Client, CommandInteraction } from 'discord.js';
 import { updateVolume } from '../../util';
 
 const slashCommand = new SlashCommandBuilder()
@@ -13,12 +13,13 @@ module.exports = {
     data: slashCommand,
     category: 'Music',
     execute(interaction: CommandInteraction) {
-        let { musicQueue, audioPlayers } = interaction.client;
+        const client: Client<true, any> = interaction.client;
+        let musicQueue = client.musicQueueManager.get(interaction.guildId);
         let guild = interaction.guild!.id!;
         let volume = interaction.options.getInteger('percent')! / 100;
         
         updateVolume(guild, volume);
-        if (musicQueue.length) audioPlayers.get(interaction.guildId!)!.resource.volume!.setVolume(volume);
+        if (!musicQueue || musicQueue.length) client.audioPlayers.get(interaction.guildId!)!.resource.volume!.setVolume(volume);
         interaction.reply(`Set the volume to ${volume * 100}%.`);
     },
 };
