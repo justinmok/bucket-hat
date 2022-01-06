@@ -48,7 +48,7 @@ module.exports = {
     
         processQuery(interaction).then(async (songs: VideoResult[]) => {
             if (!isPlaying) {
-                let volume = await getVolume(interaction.guild!.id)
+                let volume = await getVolume(interaction.guildId)
                 playQueue(connection!, queue!, volume)
                     .then(player => client.audioPlayers.set(interaction.guildId!, player));
                 interaction.editReply(`Now playing ${songs[0].title} in ${userVoice!.channel!.name}`);
@@ -56,6 +56,8 @@ module.exports = {
             else interaction.editReply(`Added ${(songs.length > 1) ? songs.length + ' items ' : songs[0].title} to the queue.`);
             global.clearTimeout(queue!.leaveTimeout);
         }).catch(err => {
+            if (err == 'no_songs') err = `Unable to find song: ${interaction.options.getString('query')!}`;
+            interaction.followUp(err);
             client.logger.log({
                 level: 'error',
                 label: 'music',

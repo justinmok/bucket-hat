@@ -87,7 +87,7 @@ module.exports = {
             .setImage('attachment://graph.png')
             .setDescription(`Last reported price on [${info.exchange}](https://www.gemini.com)`)
             .addField('🕛 24 Hour Change', `${(rise) ? '🟢 Up ' : '🔴 Down'} $${change.toFixed(2)} (${percentChange.toFixed(2)}%)`)
-            .setFooter('bucket hat bot', 'https://cdn.discordapp.com/avatars/783886978974220338/9e5abce14cce133de8c6145e556ee725.png?size=32')
+            .setFooter({ text: 'bucket hat bot', iconURL: 'https://cdn.discordapp.com/avatars/783886978974220338/9e5abce14cce133de8c6145e556ee725.png?size=32'})
 
         
         return new Promise((resolve, reject) => {

@@ -1,10 +1,12 @@
 import winston = require('winston');
 import DailyRotateFile from 'winston-daily-rotate-file';
 
-const format = winston.format((info, opts) => {
-
-    return info;
-});
+const format = (info: winston.Logform.TransformableInfo): string => {
+    info.label ?? 'main';
+    /** label padded to always be 5 chars */
+    info.label = (info.label + "  ").slice(0, 5);
+    return `${info.timestamp} - [${info.label ?? 'main'} ${info.level}] ${info.message}`
+}
 
 const rotateFileOpts = {
     frequency: '#24h',
@@ -15,8 +17,7 @@ const rotateFileOpts = {
 const logger = winston.createLogger({
     format: winston.format.combine(winston.format.timestamp({
         format: 'YYYY-MM-DD HH:mm:ss'
-    }), winston.format.printf(info =>
-        `${info.timestamp} - [${info.label ? info.label : 'main'} ${info.level}] ${info.message}`)),
+    }), winston.format.printf(info => format(info))),
     transports: [
         new winston.transports.Console(),
         new DailyRotateFile(rotateFileOpts),

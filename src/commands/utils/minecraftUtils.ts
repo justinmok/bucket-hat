@@ -6,7 +6,7 @@ enum Minecraft {
     SERVER_PORT = 25565,
 }
 
-// https://github.com/chrisdickinson/varint/blob/323cb66c382744fecd6af378bff145bc59b8af66/encode.js
+/** https://github.com/chrisdickinson/varint/blob/323cb66c382744fecd6af378bff145bc59b8af66/encode.js */
 const MSB = 0x80
   , REST = 0x7F
   , MSBALL = ~REST
@@ -65,11 +65,7 @@ export const pingServer = (host: string, port: number = Minecraft.SERVER_PORT): 
         
         client.on('data', (data) => {
             raw = Buffer.concat([raw, data]);
-            // Looks for `}}` termination
-            /*
-            console.log(raw.lastIndexOf('7d', raw.length, 'hex'));
-            console.log(raw.length - 1);
-            */
+            /** Looks for `}}` termination */
 
             if (raw.lastIndexOf('7d', 111111111111111, 'hex') == raw.length - 1) {
                 console.log(`start index: ${raw.indexOf('7b22', 0, 'hex')}`);

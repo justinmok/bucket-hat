@@ -19,7 +19,7 @@ module.exports = {
         let volume = interaction.options.getInteger('percent')! / 100;
         
         updateVolume(guild, volume);
-        if (!musicQueue || musicQueue.length) client.audioPlayers.get(interaction.guildId!)!.resource.volume!.setVolume(volume);
+        if (musicQueue || musicQueue!.length) client.audioPlayers.get(interaction.guildId!)!.resource.volume!.setVolume(volume);
         interaction.reply(`Set the volume to ${volume * 100}%.`);
     },
 };

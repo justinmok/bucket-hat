@@ -1,11 +1,10 @@
 import Discord = require('discord.js');
 import { REST } from '@discordjs/rest';
-import { Routes } from 'discord-api-types/v9'
 import { getVoiceConnection } from '@discordjs/voice';
-
-import { queryConfig, getCommands } from './util'
-import { logger } from './log'
+import { Routes } from 'discord-api-types/v9';
 import type { SlashCommandDataJSON } from '../typings/index';
+import { logger } from './log';
+import { getCommands, queryConfig } from './util';
 
 const rest = new REST({ version: '9' });
 const client = new Discord.Client({
@@ -15,7 +14,7 @@ const client = new Discord.Client({
 enum ClientEnums {
     AFK_TIMEOUT_MINUTES = 5,
     DEV_SERVER_ID = '676293029879087104',
-    TANK_SERVER_ID = '378778569465266197', // fish tank server
+    TANK_SERVER_ID = '378778569465266197', /* fish tank server */
     TEST_CLIENT_ID = '464186918457049088',
     PROD_CLIENT_ID = '783886978974220338',
 }
@@ -25,7 +24,20 @@ client.musicQueueManager = new Discord.Collection;
 client.audioPlayers = new Map();
 client.logger = logger;
 
-/* Load commands after client initialized */
+/** Retrieve token from Firestore */
+queryConfig().then(config => {
+    let token = config.token;
+    if (process.env.NODE_ENV == 'dev') token = config.testToken;
+    client.logger.log({
+        level: 'info',
+        label: 'main',
+        message: `Logging in with token ***********${token.slice(-8)}`
+    });
+    rest.setToken(token)
+    client.login(token);
+});
+
+/** Load commands after client initialized */
 client.once('ready', async () => {
     if (client.user)
         client.logger.log({
@@ -43,7 +55,7 @@ client.once('ready', async () => {
     }
 
     if (process.env.NODE_ENV == 'dev') {
-        /* debugging guilds */
+        /** debugging guilds */
         await rest.put(Routes.applicationGuildCommands(ClientEnums.TEST_CLIENT_ID, ClientEnums.TANK_SERVER_ID), { body: data });
         await rest.put(Routes.applicationGuildCommands(ClientEnums.TEST_CLIENT_ID, ClientEnums.DEV_SERVER_ID), { body: data });
     } else {
@@ -58,7 +70,7 @@ client.once('ready', async () => {
     });
 });
 
-/* Main command handler */
+/** Main command handler */
 client.on('interactionCreate', async interaction => {
     if (!interaction.isCommand() || !interaction.guild) return;
     const command = interaction.commandName;
@@ -81,7 +93,7 @@ client.on('interactionCreate', async interaction => {
     }
 });
 
-/* Remove all commands and kill process */
+/** Remove all commands and kill process */
 client.on('messageCreate', message => {
     let hasPermissions = message.member?.permissions.has(Discord.Permissions.FLAGS.ADMINISTRATOR);
     if (hasPermissions && message.content.startsWith('.refresh')) {
@@ -96,7 +108,7 @@ client.on('messageCreate', message => {
     }
 });
 
-/* AFK Timeout (5 minutes) */
+/** AFK Timeout (5 minutes) */
 client.on('voiceStateUpdate', (pre) => {
     let connection = getVoiceConnection(pre.guild.id),
         queue = client.musicQueueManager.get(pre.guild.id)!;
@@ -106,20 +118,9 @@ client.on('voiceStateUpdate', (pre) => {
             beforeChannelId = pre.channel?.id,
             isAlone = (!(pre.channel?.members.size) || pre.channel.members.size < 2);
         if (channelId == beforeChannelId && isAlone) {
-            /* Leave channel after 5 minutes */
+            /** Leave channel after 5 minutes */
             queue.leaveTimeout = setTimeout(() => { connection!.destroy() }, ClientEnums.AFK_TIMEOUT_MINUTES * 60 * 1000); 
         }
     }
 });
 
-queryConfig().then(config => {
-    let token = config.token;
-    if (process.env.NODE_ENV == 'dev') token = config.testToken;
-    client.logger.log({
-        level: 'info',
-        label: 'main',
-        message: `Logging in with token ***********${token.slice(-8)}`
-    });
-    rest.setToken(token)
-    client.login(token);
-});
