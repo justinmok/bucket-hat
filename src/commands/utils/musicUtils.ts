@@ -51,7 +51,7 @@ export class MusicQueue {
             }
         })
     }
-    
+
     public clear(): Promise<number> {
         return new Promise<number>((resolve, reject) => {
             if (this.items.length == 1) reject('Unable to remove the only playing song')
@@ -74,15 +74,14 @@ export class MusicQueue {
 const search = (query: string, resultCount: number = 1): Promise<VideoResult[]> => {
     return new Promise<Array<VideoResult>>(async (resolve, reject) => {
         if (query.match(ytRegex)) resolve([await parseUrl(query)]);
-        ytsr.getFilters(query).then(async filters => {
-            let filter = await filters.get('Type')?.get('Video');
-            if (filter && filter.url) {
-                let results: ytsr.Result = await ytsr(filter.url, { limit: resultCount });
-                resolve(<VideoResult[]>results.items);
-            } else {
-                reject(`Search failed.`);
-            }
-        })
+        let filters = await ytsr.getFilters(query)
+        let filter = await filters.get('Type')?.get('Video');
+        if (filter && filter.url) {
+            let results: ytsr.Result = await ytsr(filter.url, { limit: resultCount });
+            resolve(<VideoResult[]>results.items);
+        } else {
+            reject(`Search failed.`);
+        }
 
     });
 }
@@ -164,7 +163,7 @@ export const processQuery = (interaction: CommandInteraction): Promise<VideoResu
         let query = interaction.options.getString('query')!;
 
         if (process.env.NODE_ENV == 'dev') query = 'https://open.spotify.com/playlist/2skBZ0c1zNCnIM3ugbGLkn?si=56f0f3dad7904172';
-        
+
         if (query.match(spotifyRegex)) {
             /** get the first song then load others */
             getSongsFromSpotify(query, 1).then(results => {

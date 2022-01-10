@@ -29,8 +29,10 @@ module.exports = {
         client.audioPlayers.get(interaction.guildId!)!.player!.stop(true)
         musicQueue.items.shift();
 
-        if (connection) getVolume(interaction.guildId).then(
-            volume => playQueue(connection!, musicQueue!, volume));
+        if (connection && musicQueue) {
+            let volume = await getVolume(interaction.guildId)
+            playQueue(connection, musicQueue, volume);
+        }
         interaction.reply('Skipped!');
     },
 };

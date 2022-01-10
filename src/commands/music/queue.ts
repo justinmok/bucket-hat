@@ -165,8 +165,8 @@ module.exports = {
     data: slashCommand,
     category: 'Music',
     async execute(interaction: CommandInteraction) {
-        const client: Client<true, any> = interaction.client;
-        let queue = client.musicQueueManager.get(interaction.guildId);
+        const client: Client<true, any> = interaction.client,
+            queue = client.musicQueueManager.get(interaction.guildId);
 
         if (!queue || !queue.length) return interaction.reply('There are no items in the music queue.');
 

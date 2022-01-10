@@ -90,10 +90,9 @@ module.exports = {
             .setFooter({ text: 'bucket hat bot', iconURL: 'https://cdn.discordapp.com/avatars/783886978974220338/9e5abce14cce133de8c6145e556ee725.png?size=32'})
 
         
-        return new Promise((resolve, reject) => {
-            generateGraph(info).then(graph => {
-                resolve({ embeds: [embed], files: [graph]})
-            });
+        return new Promise(async (resolve) => {
+            let graph = await generateGraph(info);
+            resolve({ embeds: [embed], files: [graph]})
         });
 
      

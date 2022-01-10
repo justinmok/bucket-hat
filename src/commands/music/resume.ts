@@ -11,9 +11,9 @@ module.exports = {
     execute(interaction: CommandInteraction) {
         const client: Client<true, any> = interaction.client;
         let musicQueue = client.musicQueueManager.get(interaction.guildId);
-
-        if (!musicQueue || musicQueue.length == 0) return interaction.reply('There is nothing to be resumed!');
-
-        client.audioPlayers.get(interaction.guildId!)!.player!.unpause();
+        
+        if (!musicQueue || !musicQueue.length)
+            return interaction.reply('There is nothing to be resumed!');
+        client.audioPlayers.get(interaction.guildId)!.player.unpause();
     }
 }

@@ -22,6 +22,7 @@ export const createEmbed = (queueItems: QueueItem[], options: EmbedOptions = { p
         console.log(`[${minIndex}, ${maxIndex}]`);
         queueItems.slice(minIndex, maxIndex).forEach((queueItem: QueueItem, index) => {
             let { match, requester } = queueItem;
+            /** ignore the first queue item */
             if (index == 0) return;
             embed.addField(`#${minIndex + index +1} ${match.title}`, `Requested by ${requester.displayName} ([Link](${match.url}))`);
         });

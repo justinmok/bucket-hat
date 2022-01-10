@@ -18,12 +18,13 @@ module.exports = {
     category: 'Music',
     playQueue,
     execute(interaction: CommandInteraction) {
-        const client: Client<true, any> = interaction.client;
-        let user = interaction.member as GuildMember,
+        const client: Client<true, any> = interaction.client,
+            user = interaction.member as GuildMember,
             userVoice = user!.voice,
             guildId = interaction.guildId,
-            { musicQueueManager } = client,
-            queue = musicQueueManager.get(guildId);
+            { musicQueueManager } = client;
+
+        let queue = musicQueueManager.get(guildId);
 
         if (!queue) {
             queue = new MusicQueue(guildId);
@@ -43,9 +44,11 @@ module.exports = {
             adapterCreator: user.guild.voiceAdapterCreator as DiscordGatewayAdapterCreator
         })
 
+        /** verify connection */
         let connection = getVoiceConnection(interaction.guildId!);
         if (!connection) interaction.editReply('Could not join channel.')
     
+        /** start playing media */
         processQuery(interaction).then(async (songs: VideoResult[]) => {
             if (!isPlaying) {
                 let volume = await getVolume(interaction.guildId)

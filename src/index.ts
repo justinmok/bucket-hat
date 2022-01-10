@@ -46,11 +46,11 @@ client.once('ready', async () => {
             message: `Succesfully logged into ${client.user.tag}`
         });
 
-    let commands = await getCommands();
+    const commands = await getCommands();
     client.commands = commands;
 
     let data: SlashCommandDataJSON[] = [];
-    for (let [k, v] of commands) {
+    for (const [k, v] of commands) {
         data.push(v.data.toJSON())
     }
 
@@ -95,7 +95,7 @@ client.on('interactionCreate', async interaction => {
 
 /** Remove all commands and kill process */
 client.on('messageCreate', message => {
-    let hasPermissions = message.member?.permissions.has(Discord.Permissions.FLAGS.ADMINISTRATOR);
+    const hasPermissions = message.member?.permissions.has(Discord.Permissions.FLAGS.ADMINISTRATOR);
     if (hasPermissions && message.content.startsWith('.refresh')) {
         client.logger.log({
             level: 'info',
@@ -114,7 +114,7 @@ client.on('voiceStateUpdate', (pre) => {
         queue = client.musicQueueManager.get(pre.guild.id)!;
     if (!queue) return;
     else if ((queue.length == 0) && connection) {
-        let channelId = connection!.joinConfig.channelId,
+        const channelId = connection!.joinConfig.channelId,
             beforeChannelId = pre.channel?.id,
             isAlone = (!(pre.channel?.members.size) || pre.channel.members.size < 2);
         if (channelId == beforeChannelId && isAlone) {

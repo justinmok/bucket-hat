@@ -46,6 +46,12 @@ const createPacket = (host: string, port: number): Buffer => {
     return Buffer.concat([encode(length), ...packet]);
 }
 
+/**
+ * Pings a Minecraft server and tries to return information about it
+ * @param host Valid minecraft server host to ping
+ * @param port Port the server is listening on. Defaults to `25565`
+ * @returns Information about the minecraft server
+ */
 export const pingServer = (host: string, port: number = Minecraft.SERVER_PORT): Promise<MinecraftResponse> => {
     return new Promise<MinecraftResponse>((resolve, reject) => {
         const client = new net.Socket()
