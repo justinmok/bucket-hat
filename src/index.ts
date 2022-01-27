@@ -106,6 +106,10 @@ client.on('messageCreate', message => {
             for (const cmd of cmds) await client.application?.commands.delete(cmd[1]);
         }).finally(() => process.exit(-1));
     }
+
+    if (message.channel.id == '936086254741774337') {
+        setTimeout(() => { message.delete(); }, 5 * 1000);
+    }
 });
 
 /** AFK Timeout (5 minutes) */
