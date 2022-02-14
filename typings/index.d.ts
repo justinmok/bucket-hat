@@ -17,6 +17,7 @@ declare module 'discord.js' {
     /** for our purposes, guildId will always be provided */
     interface CommandInteraction {
         guildId: string
+        channel: TextBasedChannel
     }
 }
 
