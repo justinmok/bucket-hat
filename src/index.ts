@@ -109,7 +109,7 @@ client.on('messageCreate', message => {
 
     if (message.channel.id == '951924418408505434') {
         // delete message after 1 minute
-        setTimeout(() => { message.delete(); }, 60 * 1000);
+        setTimeout(() => { message.delete(); }, 10 * 1000);
     }
 });
 
