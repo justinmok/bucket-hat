@@ -94,7 +94,7 @@ client.on('interactionCreate', async interaction => {
 });
 
 /** Remove all commands and kill process */
-client.on('messageCreate', message => {
+client.on('messageCreate', async message => {
     const hasPermissions = message.member?.permissions.has(Discord.Permissions.FLAGS.ADMINISTRATOR);
     if (hasPermissions && message.content.startsWith('.refresh')) {
         client.logger.log({
@@ -105,6 +105,17 @@ client.on('messageCreate', message => {
         client.application?.commands.fetch().then(async cmds => {
             for (const cmd of cmds) await client.application?.commands.delete(cmd[1]);
         }).finally(() => process.exit(-1));
+    }
+
+    // quote channel cleaning up
+    if (message.channel.id == '747290626038431875' && !message.author.bot) {
+        if (!message.content.match(/^['">]/gi)) {
+            let response = await message.reply({ content: `\`${message.content}\` doesn't appear to be quoting anything. Perhaps use a reaction instead?\nThis message will delete itself in 10 seconds..`});
+            setTimeout(() => {
+                response.delete();
+                if (message && message.deletable) message.delete();
+            }, 10000);
+        }
     }
 
     if (message.channel.id == '951924418408505434') {
