@@ -8,13 +8,12 @@ import type { MusicQueue } from '../src/commands/utils/musicUtils';
 
 declare module 'discord.js' {
     interface Client<T> {
-        commands: Map<string, DiscordCommand>,
         audioPlayers: Map<string, AudioPlayerWithResource>
         musicQueueManager: Collection<string, MusicQueue>,
         cloudProjectId?: string,
         logger: Logger
     };
-    /** for our purposes, guildId will always be provided */
+
     interface CommandInteraction {
         guildId: string
         channel: TextBasedChannel
@@ -85,3 +84,4 @@ interface cryptoInfo extends geminiResponse {
     fiat: string,
     ticker: string,
 }
+

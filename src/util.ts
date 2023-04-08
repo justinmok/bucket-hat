@@ -2,7 +2,8 @@ import { Firestore } from '@google-cloud/firestore';
 import { request } from 'gaxios';
 import fs = require('fs');
 
-import type { BotConfig, DiscordCommand, geminiResponse, cryptoInfo } from '../typings/index';
+import type { BotConfig, DiscordCommand, geminiResponse, cryptoInfo } from '../typings/index.js';
+import { Collection } from 'discord.js';
 
 const db = new Firestore({
     projectId: 'keylimepie',
@@ -37,15 +38,17 @@ export const updateVolume = (serverId: string, volume: number) => {
     serverConfigs.doc(serverId).update({'volume': volume}).catch(e => { throw e });
 }
 
-export const getCommands = (): Promise<Map<string, DiscordCommand>> => {
-    let commandsCollection: Map<string, DiscordCommand> = new Map();
-    return new Promise<Map<string, DiscordCommand>>((resolve, reject) => {
+export const getCommands = (): Promise<Collection<string, DiscordCommand>> => {
+    let commandsCollection: Collection<string, DiscordCommand> = new Collection();
+    return new Promise<Collection<string, DiscordCommand>>((resolve, reject) => {
         let commandsFolder = fs.readdirSync('./commands').filter(dir => !dir.includes('utils'));
         for (const folder of commandsFolder) {
             const commandFiles = fs.readdirSync(`./commands/${folder}`).filter(file => file.endsWith('.js'));
             for (const file of commandFiles) {
-                const command: DiscordCommand = require(`./commands/${folder}/${file}`);
-                commandsCollection.set(command.data.toJSON().name, command);
+                import(`./commands/${folder}/${file}`).then((imported: DiscordCommand) => {
+                    commandsCollection.set(imported.toJSON().name, imported);
+                });
+                
             }
         }
         resolve(commandsCollection);
