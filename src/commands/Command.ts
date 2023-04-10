@@ -2,8 +2,8 @@ import { ChatInputCommandInteraction, PermissionsBitField, SlashCommandBuilder }
 
 type CommandCategory = 'Admin' | 'General' | 'Music' | 'Experimental';
 type RequiredPermissions = Array<PermissionsBitField>; 
-
-export class SlashCommand extends SlashCommandBuilder {
+export default class SlashCommand {
+    public data: SlashCommandBuilder;
     public category: CommandCategory;
     public permissions: RequiredPermissions;
     public interaction: ChatInputCommandInteraction;
@@ -21,7 +21,7 @@ export class SlashCommand extends SlashCommandBuilder {
      * @param execute - Function to be executed
      */
     constructor(execute: (ChatInputCommandInteraction) => any) {
-        super();
+        this.data = new SlashCommandBuilder();
         this.execute = execute;
         this.category = 'General';
     }
@@ -32,9 +32,9 @@ export class SlashCommand extends SlashCommandBuilder {
      * @param perms - The permissions - as an array of PermissionsBitField
      * @returns The slash command
      */
-    public setPermissions (perms: RequiredPermissions): SlashCommand {
+    public setPermissions (perms: RequiredPermissions): SlashCommandBuilder {
         this.permissions = perms;
-        return this;
+        return this.data;
     }
 
     /**
@@ -43,9 +43,13 @@ export class SlashCommand extends SlashCommandBuilder {
      * @param category - The name of the category
      * @returns The slash command
      */
-    public setCategory (category: CommandCategory): SlashCommand {
+    public setCategory (category: CommandCategory): SlashCommandBuilder {
         this.category = category;
-        return this;
+        return this.data;
+    }
+
+    public getName = (): string => {
+        return this.data.name;
     }
 
 }

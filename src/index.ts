@@ -7,6 +7,7 @@ import { Routes } from 'discord-api-types/v10';
 import { queryConfig } from './util.js';
 import * as winston from 'winston';
 import { logger } from './log.js';
+import type SlashCommand from './commands/Command.js';
 
 class ClientExtend extends Client<true, any> {
     public commands: Collection<string, SlashCommand>;
@@ -19,12 +20,11 @@ class ClientExtend extends Client<true, any> {
     }
 }
 
+// todo: initialize client with other options
 const rest = new REST({ version: '9' });
 const client = new ClientExtend({
     intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.GuildVoiceStates, GatewayIntentBits.GuildMessageReactions, GatewayIntentBits.GuildMembers]
-    // BREAKING // intents: ['GUILDS', 'GUILD_MESSAGES', 'GUILD_VOICE_STATES', 'GUILD_MESSAGE_REACTIONS', 'GUILD_MEMBERS']
 });
-
 
 enum ClientEnums {
     AFK_TIMEOUT_MINUTES = 5,
@@ -33,7 +33,6 @@ enum ClientEnums {
     TEST_CLIENT_ID = '464186918457049088',
     PROD_CLIENT_ID = '783886978974220338',
 }
-
 
 /** Retrieve token from Firestore */
 queryConfig().then(config => {
@@ -48,10 +47,6 @@ queryConfig().then(config => {
     client.login(token);
 });
 
-
-import ExampleCommand from './commands/test.js'
-import { SlashCommand } from './commands/Command.js';
-
 /** Load commands after client initialized */
 client.once('ready', async () => {
     if (client.user)
@@ -61,20 +56,15 @@ client.once('ready', async () => {
             message: `Succesfully logged into ${client.user.tag}`
         });
 
-    /* const commands = await getCommands();
-    client.commands = commands;
+    // import commands dynamically
+    // todo: multiple commands file handler
+    const ExampleCommand = await import(''+'./commands/test.js');
+    const cmd: SlashCommand = ExampleCommand.default;
 
     let data: RESTPostAPIChatInputApplicationCommandsJSONBody[] = [];
-    for (const [k, v] of commands) {
-        data.push(v.data.toJSON())
-    }
 
-    
-    */
-    let data: RESTPostAPIChatInputApplicationCommandsJSONBody[] = [];
-    
-    client.commands.set(ExampleCommand.name, ExampleCommand);
-    data.push(ExampleCommand.toJSON());
+    data.push(cmd.data.toJSON());
+    client.commands.set(cmd.data.name, cmd);
 
     if (process.env.NODE_ENV == 'dev') {
         // debugging guilds
@@ -95,8 +85,10 @@ client.once('ready', async () => {
 /** Main command handler */
 client.on('interactionCreate', async interaction => {
     if (!interaction.isCommand() || !interaction.guild) return;
+    
     const interactionCommand = interaction.command;
     const command = interaction.commandName;
+
     try {
         
         /* Check if command actually exists and has a function */

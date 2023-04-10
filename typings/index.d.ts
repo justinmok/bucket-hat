@@ -23,23 +23,7 @@ interface BotConfig {
     testToken: string,
 }
 
-
 interface embed {
     name: string,
     createEmbed(...args): MessageEmbed;
 }
-
-interface SlashCommandDataJSON {
-    name: string;
-    description: string;
-    options: APIApplicationCommandOption[];
-    default_permission: boolean | undefined;
-}
-interface DiscordCommand extends ApplicationCommand {
-    data: SlashCommandBuilder
-    toJSON(): SlashCommandDataJSON
-    category: 'Admin' | 'General' | 'Music' | 'Experimental',
-    execute(...args): any
-}
-
-type BotCommands = Collection<string, DiscordCommand>;

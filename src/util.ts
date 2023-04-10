@@ -1,7 +1,5 @@
 import { Firestore } from '@google-cloud/firestore';
-import fs = require('fs');
-import type { BotConfig, DiscordCommand } from '../typings/index.js';
-import { Collection } from 'discord.js';
+import type { BotConfig } from '../typings/index.js';
 
 const db = new Firestore({
     projectId: 'keylimepie',
@@ -36,6 +34,7 @@ export const updateVolume = (serverId: string, volume: number) => {
     serverConfigs.doc(serverId).update({'volume': volume}).catch(e => { throw e });
 }
 
+/* 
 export const getCommands = (): Promise<Collection<string, DiscordCommand>> => {
     let commandsCollection: Collection<string, DiscordCommand> = new Collection();
     return new Promise<Collection<string, DiscordCommand>>((resolve, reject) => {
@@ -52,3 +51,4 @@ export const getCommands = (): Promise<Collection<string, DiscordCommand>> => {
         resolve(commandsCollection);
     });
 }
+*/
