@@ -8,8 +8,6 @@ import type { MusicQueue } from '../src/commands/utils/musicUtils';
 
 declare module 'discord.js' {
     interface Client<T> {
-        audioPlayers: Map<string, AudioPlayerWithResource>
-        musicQueueManager: Collection<string, MusicQueue>,
         cloudProjectId?: string,
         logger: Logger
     };
@@ -20,16 +18,11 @@ declare module 'discord.js' {
     }
 }
 
-interface AudioPlayerWithResource {
-    player: AudioPlayer
-    resource: AudioResource
-}
 interface BotConfig {
     token: string,
     testToken: string,
 }
 
-type VideoResult = Omit<ytsr.Video, 'bestThumbnail' | 'author' | 'isUpcoming' | 'views' |'isLive' | 'badges' | 'isComing' | 'upcoming' | 'uploadedAt' | 'description'> 
 
 interface embed {
     name: string,
@@ -49,39 +42,4 @@ interface DiscordCommand extends ApplicationCommand {
     execute(...args): any
 }
 
-interface MinecraftResponse {
-    description: {
-        text: string
-    },
-    players: {
-        max: number,
-        online: number,
-        sample: [ name: string, id: string ]
-    }
-    version: {
-        name: string,
-        protocol: number,
-    }
-    favicon?: string,
-    ping: number,
-}
-
 type BotCommands = Collection<string, DiscordCommand>;
-
-interface geminiResponse {
-    symbol: string,
-    open: string,
-    high: string,
-    low: string,
-    close: string,
-    changes: string[],
-    bid: string,
-    ask: string,
-}
-
-interface cryptoInfo extends geminiResponse {
-    exchange: string,
-    fiat: string,
-    ticker: string,
-}
-

@@ -1,8 +1,6 @@
 import { Firestore } from '@google-cloud/firestore';
-import { request } from 'gaxios';
 import fs = require('fs');
-
-import type { BotConfig, DiscordCommand, geminiResponse, cryptoInfo } from '../typings/index.js';
+import type { BotConfig, DiscordCommand } from '../typings/index.js';
 import { Collection } from 'discord.js';
 
 const db = new Firestore({
@@ -54,15 +52,3 @@ export const getCommands = (): Promise<Collection<string, DiscordCommand>> => {
         resolve(commandsCollection);
     });
 }
-
-export const queryCrypto = (ticker: string, base: string = 'USD'): Promise<cryptoInfo> => {
-    return new Promise<cryptoInfo>((resolve, reject) => {
-        request({
-            url: `https://api.gemini.com/v2/ticker/${ticker}${base}`
-        }).then(res => {
-            if (res.status != 200) reject('Request failed');
-            let data = res.data as geminiResponse;
-            resolve({...data, exchange: 'Gemini', fiat: base.toUpperCase(), ticker: ticker.toUpperCase()})
-        }).catch(e => reject(e));
-    });
-};

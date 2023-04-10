@@ -10,7 +10,6 @@ import { logger } from './log.js';
 
 class ClientExtend extends Client<true, any> {
     public commands: Collection<string, SlashCommand>;
-    //public audioPlayers: Collection<string, AudioPlayer>;
     public logger: winston.Logger;
 
     constructor(options: ClientOptions) {
@@ -142,16 +141,14 @@ client.on('messageCreate', async message => {
 
 /** VC AFK Timeout (5 minutes) */
 client.on('voiceStateUpdate', (pre) => {
-    let connection = getVoiceConnection(pre.guild.id),
-        queue = client.musicQueueManager.get(pre.guild.id)!;
-    if (!queue) return;
-    else if ((queue.length == 0) && connection) {
+    let connection = getVoiceConnection(pre.guild.id);
+    if (connection) {
         const channelId = connection!.joinConfig.channelId,
             beforeChannelId = pre.channel?.id,
             isAlone = (!(pre.channel?.members.size) || pre.channel.members.size < 2);
         if (channelId == beforeChannelId && isAlone) {
             /** Leave channel after 5 minutes */
-            queue.leaveTimeout = setTimeout(() => { connection!.destroy() }, ClientEnums.AFK_TIMEOUT_MINUTES * 60 * 1000); 
+            setTimeout(() => { connection!.destroy() }, ClientEnums.AFK_TIMEOUT_MINUTES * 60 * 1000); 
         }
     }
 });
