@@ -1,6 +1,6 @@
-import { Client, GatewayIntentBits, ClientOptions, PermissionsBitField, RESTPostAPIChatInputApplicationCommandsJSONBody, SlashCommandBuilder } from 'discord.js'
+import { Client, GatewayIntentBits, ClientOptions, RESTPostAPIChatInputApplicationCommandsJSONBody, Collection, PermissionsBitField } from 'discord.js'
 
-import { Collection } from 'discord.js';
+import { } from 'discord.js';
 import { REST } from '@discordjs/rest';
 import { getVoiceConnection } from '@discordjs/voice';
 import { Routes } from 'discord-api-types/v10';
