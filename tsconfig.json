@@ -9,9 +9,9 @@
       "typeRoots": ["./typings"],
       "paths": {"*": ["./typings/*"]},
       "skipLibCheck": true,
-      "module": "CommonJS",
+      "module": "NodeNext",
       "sourceMap": true
     },
-    "include": ["./src/**/*"],
+    "include": ["./src/**/*", "./typings/**/*"],
     "exclude": [".node_modules/"]
 }
