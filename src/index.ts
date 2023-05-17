@@ -119,7 +119,7 @@ client.on('messageCreate', async (message) => {
     const hasPermissions = message.member?.permissions.has(
         PermissionsBitField.Flags.Administrator
     );
-    if (!hasPermissions && !message.content.startsWith('.refresh')) return;
+    if (!hasPermissions || !message.content.startsWith('.refresh')) return;
     client.logger.log({
         level: 'info',
         label: 'main',
