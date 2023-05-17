@@ -87,7 +87,7 @@ client.once('ready', async () => {
             message: `Succesfully logged into ${client.user.tag}`,
         });
 
-        if (process.env.NODE_ENV == 'dev') {
+        if (process.env.NODE_ENV == 'dev')
             await rest.put(
                 Routes.applicationGuildCommands(
                     ClientEnums.TEST_CLIENT_ID,
@@ -95,12 +95,6 @@ client.once('ready', async () => {
                 ),
                 { body: data }
             );
-        } else {
-            await rest.put(
-                Routes.applicationCommands(ClientEnums.PROD_CLIENT_ID),
-                { body: data }
-            );
-        }
     }
 
     await client.application?.commands.fetch();
@@ -126,14 +120,17 @@ client.on('messageCreate', async (message) => {
         message: `Application command refresh called by ${message.author.username}!`,
     });
 
+    const commands = Array.from(client.commands.values());
+    let body = getCommandsBody(commands);
+    console.log(body);
     rest.put(Routes.applicationCommands(ClientEnums.PROD_CLIENT_ID), {
-        body: [],
+        body,
     })
         .then(() => {
             client.logger.log({
                 level: 'info',
                 label: 'main',
-                message: `Application commands removed!`,
+                message: `Application commands refreshed!`,
             });
         })
         .catch(logger.error)
