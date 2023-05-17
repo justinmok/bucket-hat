@@ -1,54 +1,61 @@
 import { Firestore } from '@google-cloud/firestore';
 import type { BotConfig } from '../typings/index.js';
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
+import SlashCommand from './commands/Command.js';
+import { logger } from './log.js';
 
 const db = new Firestore({
     projectId: 'keylimepie',
-    keyFilename: '../gcloudauth.json'
+    keyFilename: '../gcloudauth.json',
 });
 
-const serverConfigs = db.doc('config/by_server').collection('server');
-
 export const queryConfig = (): Promise<BotConfig> => {
-    return new Promise<BotConfig>((resolve, reject) => {
-        db.doc('config/global').get().then((ret) => {
-            let fetchedConfig = ret.data();
-            if (!fetchedConfig) reject('Can\'t get config');
-            resolve({
-                token: fetchedConfig?.token,
-                testToken: fetchedConfig?.testToken,
-            });
+    logger.log({
+        level: 'debug',
+        label: 'db',
+        message: `Accessing Firestore Configuration`,
+    });
+    return db
+        .doc('config/global')
+        .get()
+        .then((snap) => {
+            let fetchedConfig = snap.data();
+            if (fetchedConfig) {
+                return {
+                    openapiKey: fetchedConfig.openapiKey,
+                    openapiOrg: fetchedConfig.openapiOrg,
+                    token: fetchedConfig.token,
+                    testToken: fetchedConfig.testToken,
+                };
+            } else throw new Error('Can\t get config');
         });
-    });
-}
+};
 
-export const getVolume = (serverId: string): Promise<number> => {
-    return new Promise<number>((resolve, reject) => {
-        serverConfigs.doc(serverId.toString()).get().then(config => {
-            if (!(config.data())) reject('vol_not_set');
-            else resolve(config.data()!.volume);
-        })
-    });
-}
+export const getCommands = async (): Promise<SlashCommand[]> => {
+    const cmdsPath = path.join(
+        path.dirname(fileURLToPath(import.meta.url)),
+        'commands'
+    );
 
-export const updateVolume = (serverId: string, volume: number) => {
-    serverConfigs.doc(serverId).update({'volume': volume}).catch(e => { throw e });
-}
-
-/* 
-export const getCommands = (): Promise<Collection<string, DiscordCommand>> => {
-    let commandsCollection: Collection<string, DiscordCommand> = new Collection();
-    return new Promise<Collection<string, DiscordCommand>>((resolve, reject) => {
-        let commandsFolder = fs.readdirSync('./commands').filter(dir => !dir.includes('utils'));
-        for (const folder of commandsFolder) {
-            const commandFiles = fs.readdirSync(`./commands/${folder}`).filter(file => file.endsWith('.js'));
-            for (const file of commandFiles) {
-                import(`./commands/${folder}/${file}`).then((imported: DiscordCommand) => {
-                    commandsCollection.set(imported.toJSON().name, imported);
+    return fs.promises.readdir(cmdsPath).then(async (files) => {
+        let cmds: SlashCommand[] = [];
+        files
+            .filter((file) => file.endsWith('.command.js'))
+            .map(async (file) => {
+                logger.log({
+                    level: 'debug',
+                    message: `Retrieving command file: ${file}`,
                 });
-                
-            }
-        }
-        resolve(commandsCollection);
+                const imported = await import(`./commands/${file}`);
+                const cmd: SlashCommand = imported.default;
+                cmds.push(cmd);
+            });
+        return cmds;
     });
-}
-*/
+};
+
+export const getCommandsBody = (cmds: SlashCommand[]) => {
+    return cmds.map((cmd) => cmd.data.toJSON());
+};

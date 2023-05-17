@@ -5,10 +5,12 @@
         "mocha": true,
         "es2021": true
     },
-    "extends": "eslint:recommended",
+    "extends": ["eslint:recommended", "prettier"], 
     "parserOptions": {
+        "sourceType": "module",
         "ecmaVersion": 12
     },
+    "ignorePatterns": ["./build/*.js"],
     "rules": {
         "indent": [
             "error",

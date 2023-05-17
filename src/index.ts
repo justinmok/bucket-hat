@@ -1,13 +1,19 @@
-import { Client, GatewayIntentBits, ClientOptions, RESTPostAPIChatInputApplicationCommandsJSONBody, Collection, PermissionsBitField } from 'discord.js'
+import {
+    Client,
+    GatewayIntentBits,
+    ClientOptions,
+    Collection,
+    PermissionsBitField,
+} from 'discord.js';
 
-import { } from 'discord.js';
 import { REST } from '@discordjs/rest';
 import { getVoiceConnection } from '@discordjs/voice';
 import { Routes } from 'discord-api-types/v10';
-import { queryConfig } from './util.js';
+import { getCommands, getCommandsBody, queryConfig } from './util.js';
 import * as winston from 'winston';
 import { logger } from './log.js';
 import type SlashCommand from './commands/Command.js';
+import { interactionHandler } from './events/Events.js';
 
 class ClientExtend extends Client<true, any> {
     public commands: Collection<string, SlashCommand>;
@@ -23,112 +29,115 @@ class ClientExtend extends Client<true, any> {
 // todo: initialize client with other options
 const rest = new REST({ version: '9' });
 const client = new ClientExtend({
-    intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.GuildVoiceStates, GatewayIntentBits.GuildMessageReactions, GatewayIntentBits.GuildMembers]
+    intents: [
+        GatewayIntentBits.Guilds,
+        GatewayIntentBits.GuildMessages,
+        GatewayIntentBits.GuildVoiceStates,
+        GatewayIntentBits.GuildMessageReactions,
+        GatewayIntentBits.GuildMembers,
+        GatewayIntentBits.MessageContent,
+    ],
 });
 
 enum ClientEnums {
     AFK_TIMEOUT_MINUTES = 5,
     DEV_SERVER_ID = '676293029879087104',
-    TANK_SERVER_ID = '378778569465266197', /* fish tank server */
+    TANK_SERVER_ID = '378778569465266197' /* fish tank server */,
     TEST_CLIENT_ID = '464186918457049088',
     PROD_CLIENT_ID = '783886978974220338',
 }
 
-/** Retrieve token from Firestore */
-queryConfig().then(config => {
-    let token = config.token;
-    if (process.env.NODE_ENV == 'dev') token = config.testToken;
-    client.logger.log({
-        level: 'info',
-        label: 'main',
-        message: `Logging in with token ***********${token.slice(-8)}`
-    });
-    rest.setToken(token)
-    client.login(token);
-});
+Promise.all([queryConfig(), getCommands()])
+    .then((values) => {
+        const config = values[0];
+        const cmds = values[1];
 
-/** Load commands after client initialized */
-client.once('ready', async () => {
-    if (client.user)
+        let token = config.token;
+        if (process.env.NODE_ENV == 'dev') token = config.testToken;
         client.logger.log({
             level: 'info',
             label: 'main',
-            message: `Succesfully logged into ${client.user.tag}`
+            message: `Logging in with token ***********${token.slice(-8)}`,
         });
 
-    // import commands dynamically
-    // todo: multiple commands file handler
-    const ExampleCommand = await import(''+'./commands/test.js');
-    const cmd: SlashCommand = ExampleCommand.default;
+        cmds.forEach((cmd) => client.commands.set(cmd.data.name, cmd));
 
-    let data: RESTPostAPIChatInputApplicationCommandsJSONBody[] = [];
+        rest.setToken(token);
+        client.login(token);
+    })
+    .catch((e) => {
+        // fatal
+        client.logger.log({
+            level: 'crit',
+            label: 'main',
+            message: 'Unexpected error during startup. Exiting.',
+        });
+        process.exit(-1);
+    });
 
-    data.push(cmd.data.toJSON());
-    client.commands.set(cmd.data.name, cmd);
+/** Load commands after client initialized */
+client.once('ready', async () => {
+    const commands = Array.from(client.commands.values());
+    let data = getCommandsBody(commands);
 
-    if (process.env.NODE_ENV == 'dev') {
-        // debugging guilds
-        //await rest.put(Routes.applicationGuildCommands(ClientEnums.TEST_CLIENT_ID, ClientEnums.TANK_SERVER_ID), { body: data });
-        await rest.put(Routes.applicationGuildCommands(ClientEnums.TEST_CLIENT_ID, ClientEnums.DEV_SERVER_ID), { body: data });
-    } else {
-        await rest.put(Routes.applicationCommands(ClientEnums.PROD_CLIENT_ID), { body: data });
+    if (client.user) {
+        client.logger.log({
+            level: 'info',
+            label: 'main',
+            message: `Succesfully logged into ${client.user.tag}`,
+        });
+
+        if (process.env.NODE_ENV == 'dev') {
+            await rest.put(
+                Routes.applicationGuildCommands(
+                    ClientEnums.TEST_CLIENT_ID,
+                    ClientEnums.DEV_SERVER_ID
+                ),
+                { body: data }
+            );
+        } else {
+            await rest.put(
+                Routes.applicationCommands(ClientEnums.PROD_CLIENT_ID),
+                { body: data }
+            );
+        }
     }
-    
+
     await client.application?.commands.fetch();
     client.logger.log({
         level: 'info',
         label: 'main',
-        message: `Loaded ${client.application?.commands.cache.size} commands.`
+        message: `Loaded ${client.application?.commands.cache.size} commands.`,
     });
 });
 
 /** Main command handler */
-client.on('interactionCreate', async interaction => {
-    if (!interaction.isCommand() || !interaction.guild) return;
-    
-    const interactionCommand = interaction.command;
-    const command = interaction.commandName;
-
-    try {
-        
-        /* Check if command actually exists and has a function */
-        if (!(client.commands.get(command)) ||
-            (client.commands.get(command)?.execute == undefined)) {
-                console.log(client.commands.get(command));
-                throw `Command ${command} does not exist in client`;
-        } else {
-            client.commands.get(command)!.execute(interaction);
-            client.logger.log({
-                level: 'verbose',
-                label: 'main',
-                guild: interaction.guild,
-                channel: interaction.channel,
-                user: interaction.user,
-                message: `Ran command ${command}`
-            });
-        }
-    } catch (e) {
-        client.logger.log({
-            level: 'error',
-            label: 'main',
-            message: e.stack ?? e
-        });
-    }
-});
+client.on('interactionCreate', interactionHandler);
 
 /** Remove all commands and kill process */
-client.on('messageCreate', async message => {
-    const hasPermissions = message.member?.permissions.has(PermissionsBitField.Flags.Administrator);
-    if (hasPermissions && message.content.startsWith('.refresh')) {
-        client.logger.log({
-            level: 'info',
-            label: 'main',
-            message: `Application command refresh called by ${message.author.username}!`
-        });
-        client.application?.commands.fetch().then(async cmds => {
-            for (const cmd of cmds) await client.application?.commands.delete(cmd[1]);
-        }).finally(() => process.exit(-1));
-    }
+client.on('messageCreate', async (message) => {
+    const hasPermissions = message.member?.permissions.has(
+        PermissionsBitField.Flags.Administrator
+    );
+    if (!hasPermissions && !message.content.startsWith('.refresh')) return;
+    client.logger.log({
+        level: 'info',
+        label: 'main',
+        message: `Application command refresh called by ${message.author.username}!`,
+    });
+
+    rest.put(Routes.applicationCommands(ClientEnums.PROD_CLIENT_ID), {
+        body: [],
+    })
+        .then(() => {
+            client.logger.log({
+                level: 'info',
+                label: 'main',
+                message: `Application commands removed!`,
+            });
+        })
+        .catch(logger.error)
+        .finally(() => process.exit(-1));
 });
 
 /** VC AFK Timeout (5 minutes) */
@@ -137,11 +146,13 @@ client.on('voiceStateUpdate', (pre) => {
     if (connection) {
         const channelId = connection!.joinConfig.channelId,
             beforeChannelId = pre.channel?.id,
-            isAlone = (!(pre.channel?.members.size) || pre.channel.members.size < 2);
+            isAlone =
+                !pre.channel?.members.size || pre.channel.members.size < 2;
         if (channelId == beforeChannelId && isAlone) {
             /** Leave channel after 5 minutes */
-            setTimeout(() => { connection!.destroy() }, ClientEnums.AFK_TIMEOUT_MINUTES * 60 * 1000); 
+            setTimeout(() => {
+                connection!.destroy();
+            }, ClientEnums.AFK_TIMEOUT_MINUTES * 60 * 1000);
         }
     }
 });
-
