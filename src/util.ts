@@ -11,7 +11,7 @@ const db = new Firestore({
     keyFilename: '../gcloudauth.json',
 });
 
-export const queryConfig = (): Promise<BotConfig> => {
+const queryConfig = (): Promise<BotConfig> => {
     logger.log({
         level: 'debug',
         label: 'db',
@@ -59,3 +59,5 @@ export const getCommands = async (): Promise<SlashCommand[]> => {
 export const getCommandsBody = (cmds: SlashCommand[]) => {
     return cmds.map((cmd) => cmd.data.toJSON());
 };
+
+export const config = await queryConfig();

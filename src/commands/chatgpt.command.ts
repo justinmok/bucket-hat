@@ -8,14 +8,14 @@ import {
     Message,
 } from 'discord.js';
 
-import { Configuration, OpenAIApi } from 'openai';
 import SlashCommand from './Command.js';
-import type { ChatCompletionRequestMessage } from 'openai';
+import { Configuration, OpenAIApi, ChatCompletionRequestMessage } from 'openai';
 import { logger } from '../log.js';
+import { config } from '../util.js';
 
 const configuration = new Configuration({
-    organization: 'org-WK9JqJAfdoWBonkMmpNSkmLB',
-    apiKey: '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',
+    organization: config.openapiOrg,
+    apiKey: config.openapiKey,
 });
 const openai = new OpenAIApi(configuration);
 

@@ -3,7 +3,6 @@ import DailyRotateFile from 'winston-daily-rotate-file';
 
 const format = (info: winston.Logform.TransformableInfo): string => {
     let label = info.label ?? 'main';
-    /** label padded to always be 5 chars */
     return `${info.timestamp} - [${info.level}] [${label}] ${info.message}`;
 };
 
